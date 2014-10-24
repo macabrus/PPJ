@@ -1,5 +1,6 @@
 package labos1;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 
 /**
@@ -7,9 +8,9 @@ import java.util.ArrayList;
  * @author Ivan Paljak
  *
  */
-public class Automaton {
+public class Automaton implements Serializable{
 
-	class Pair {
+	class Pair implements Serializable{
 		
 		public int fst, snd;
 		
@@ -30,7 +31,7 @@ public class Automaton {
 		
 	}
 	
-	class Transition {
+	class Transition implements Serializable {
 		
 		public int fst, snd;
 		public char c;
@@ -199,7 +200,7 @@ public class Automaton {
 						addTransition(l, r, regex.charAt(i));
 					}
 				} else {
-					int j = findClosed(regex, i);
+					int j = findClosed(regex, i + 1);
 					Pair tmp = constructAutomaton(regex.substring(i + 1, j));
 					l = tmp.fst;
 					r = tmp.snd;

@@ -1,14 +1,25 @@
 package labos1;
 
 import java.io.BufferedReader;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.io.ObjectOutputStream;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
 import java.lang.String;
 
 public class Generator {
 
 	private static ArrayList<RegularDefinition> regDefs = new ArrayList<>();
+	private static ArrayList<String> LAStates = new ArrayList<>();
+	private static ArrayList<String> lexItems = new ArrayList<>();
+	private static ArrayList<Rule> rules  = new ArrayList<>();
+	
+	private static Map<String, Automaton> mapa = new HashMap<>(); 
 	
 	public static void parseInput() throws IOException {
 		
@@ -21,10 +32,38 @@ public class Generator {
 			regDefs.add(new RegularDefinition(dubrovnik[0], dubrovnik[1]));
 		}
 	
-		printDefinitions(); System.out.println("");
-	
 		parseRegularDefinitions();
-		printDefinitions();
+		
+		// parse LA states
+		LAStates = new ArrayList<>(Arrays.asList(currLine.split(" ")));
+		LAStates.remove(0);
+		
+		// parse lexical items
+		currLine = br.readLine();
+		lexItems = new ArrayList<>(Arrays.asList(currLine.split(" ")));
+		lexItems.remove(0);
+		
+		// parse LA rules 
+		while ((currLine = br.readLine()) != null) {
+			
+			String state = currLine.substring(1, currLine.indexOf('>'));
+			String regex = parseRegex(currLine.substring(currLine.indexOf('>') + 1));
+			ArrayList<String> actions = new ArrayList<>();
+			
+			while (!(currLine = br.readLine()).equals("}")) {
+				if (currLine.equals("}")) continue;
+				actions.add(currLine);
+			}
+			
+			rules.add(new Rule(state, regex, actions));
+			
+			if (!mapa.containsKey(regex)) {
+				mapa.put(regex, new Automaton(regex));
+			}
+			
+		}
+		
+		Collections.sort(rules);
 		
 	}
 		
@@ -50,10 +89,51 @@ public class Generator {
 		}
 	}
 	
+	/**
+	 * Gleda dal u konkretnom regexu ima nekih referenci...
+	 * @param regex
+	 */
+	private static String parseRegex(String regex) {
+		for (int i = 0; i < regDefs.size(); ++i) {
+			regex = regex.replaceAll(
+					regDefs.get(i).getName().replaceAll("\\{", "\\\\\\{").replaceAll("\\}", "\\\\\\}"), 
+					"(" + regDefs.get(i).getDefinition() + ")"
+			);	
+		}
+		return regex;
+	}
+	
+	private static void outputCollections() throws IOException {
+		
+		FileOutputStream fout = new FileOutputStream("src/labos1/analizator/automata.ser");
+		ObjectOutputStream oos = new ObjectOutputStream(fout);
+		
+		oos.writeObject(mapa);
+		
+		fout = new FileOutputStream("src/labos1/analizator/states.ser");
+		oos = new ObjectOutputStream(fout);
+		oos.writeObject(LAStates);
+		
+		fout = new FileOutputStream("src/labos1/analizator/items.ser");
+		oos = new ObjectOutputStream(fout);
+		oos.writeObject(lexItems);
+		
+		fout = new FileOutputStream("src/labos1/analizator/rules.ser");
+		oos = new ObjectOutputStream(fout);
+		oos.writeObject(rules);
+
+	}
+	
 	public static void main(String[] args) throws IOException {
 		
 		parseInput();
 		
+		for (int i = 0; i < LAStates.size(); ++i) System.out.println(LAStates.get(i));
+		for (int i = 0; i < lexItems.size(); ++i) System.out.println(lexItems.get(i));
+		
+		
+		outputCollections();
+				
 	}
 	
 }
