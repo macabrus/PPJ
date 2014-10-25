@@ -8,23 +8,32 @@ import java.util.ArrayList;
  * 
  * @author Ivan Paljak
  */
-public class Rule implements Comparable<Rule>, Serializable {
+public class Rule implements Serializable {
 
+
+	private static final long serialVersionUID = 1L;
 	private String state; 
-	private String regex; 
+	private Automaton automaton; 
 	
 	private ArrayList<String> actions;
 	
-	public Rule(String state, String regex, ArrayList<String> actions) {
+	public Rule(String state, Automaton automaton, ArrayList<String> actions) {
 		this.state = state; 
-		this.regex = regex;
+		this.automaton = automaton;
 		this.actions = actions;
 	}
 	
-	@Override
-	public int compareTo(Rule o) {
-		return this.state.compareTo(o.state);
+	/* getteri */
+	public String getState() {
+		return this.state;
 	}
 	
+	public Automaton getAutomaton() {
+		return this.automaton;
+	}
+	
+	public ArrayList<String> getActions() {
+		return this.actions;
+	}
 	
 }

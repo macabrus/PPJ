@@ -10,8 +10,13 @@ import java.util.ArrayList;
  */
 public class Automaton implements Serializable{
 
+	
+	private static final long serialVersionUID = 1L;
+
 	class Pair implements Serializable{
 		
+
+		private static final long serialVersionUID = 1L;
 		public int fst, snd;
 		
 		public Pair(int fst, int snd) {
@@ -33,6 +38,7 @@ public class Automaton implements Serializable{
 	
 	class Transition implements Serializable {
 		
+		private static final long serialVersionUID = 1L;
 		public int fst, snd;
 		public char c;
 		
@@ -55,40 +61,99 @@ public class Automaton implements Serializable{
 		
 	}
 	
+	private ArrayList<Integer> activeStates; 
+	
 	private int states;
-	
 	private String regex; 
-	
 	private Pair P;
 	
 	ArrayList<Pair> epsTransitions = new ArrayList<>();
 	ArrayList<Transition> transitions = new ArrayList<>();
 	
 	/**
-	 * Konstruira automat koji prihvaca zadani regularni izraz
+	 * Konstruira automat koji prihvaca zadani regularni izraz,
+	 * nakon stvaranja objekta automat je inicijaliziran!
 	 * @param regex
 	 */
 	public Automaton(String regex) {
 		this.regex = regex;	
 		P = constructAutomaton(this.regex);
+		this.initialize();
+	}
+	
+	/**
+	 * @return pocetnp stanje automata
+	 */
+	public int getStartingState() {
+		return P.fst;
+	}
+	
+	/**
+	 * @return prihvatljivo stanje automata
+	 */
+	public int getFinalState() {
+		return P.snd;
+	}
+	
+	/**
+	 * @return True ako se automat nalazi u prihvatljivom stanju, inace false. 
+	 */
+	public boolean isAccepted() {
+		for (Integer i : activeStates) {
+			if (i.intValue() == getFinalState()) return true;
+		}
+		return false;
+	}
+	
+	/**
+	 * Inicijalizira automat
+	 */
+	public void initialize() {
+		activeStates = new ArrayList<>();
+		activeStates.add(this.getStartingState());
+		makeEpsilonTransitions();
+	}
+	
+	/**
+	 * radi prijelaze s obzirom na ucitani znak. Znak '$' oznacava epsilon.
+	 * @param c
+	 */
+	public void makeTransitions(char c) {
+		
+		if (c == '$') { makeEpsilonTransitions(); return; }
+
+		ArrayList<Integer> newStates = new ArrayList<>();
+		
+		for (Transition t : transitions) {
+			if (!activeStates.contains(t.fst) || c != t.c) continue;
+			newStates.add(t.snd);
+		}
+		
+		this.activeStates = newStates; 
+		makeEpsilonTransitions();
+		
+	}
+	
+	private void makeEpsilonTransitions() {
+		
+		boolean addedState;
+		do {
+			addedState = false;
+			for (Pair p : epsTransitions) {
+				if (this.activeStates.contains(p.fst) && !this.activeStates.contains(p.snd)) {
+					addedState = true;
+					activeStates.add(p.snd);
+				}
+			}
+			
+		} while (addedState);
+		
+	
+		
 	}
 	
 	private int requestNewState() {
 		return ++states;
-	}
-	
-	/**
-	 * @return pocetno stanje automata
-	 */
-	private int getStart() {
-		return P.fst;
-	}
-	
-	/*
-	 * @return prihvatljivo stanje automaata
-	 */
-	private int getAccept() {
-		return P.snd;
 	}
 	
 	/**

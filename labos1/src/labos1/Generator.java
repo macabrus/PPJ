@@ -54,16 +54,19 @@ public class Generator {
 				if (currLine.equals("}")) continue;
 				actions.add(currLine);
 			}
-			
-			rules.add(new Rule(state, regex, actions));
+
+			Automaton regAutomaton = null; 
 			
 			if (!mapa.containsKey(regex)) {
-				mapa.put(regex, new Automaton(regex));
+				regAutomaton = new Automaton(regex);
+				mapa.put(regex, regAutomaton);
+			} else {
+				regAutomaton = mapa.get(regex);
 			}
+
+			rules.add(new Rule(state, regAutomaton, actions));
 			
 		}
-		
-		Collections.sort(rules);
 		
 	}
 		
@@ -105,23 +108,24 @@ public class Generator {
 	
 	private static void outputCollections() throws IOException {
 		
-		FileOutputStream fout = new FileOutputStream("src/labos1/analizator/automata.ser");
+		
+		FileOutputStream fout = new FileOutputStream("src/labos1/analizator/states.ser");
 		ObjectOutputStream oos = new ObjectOutputStream(fout);
-		
-		oos.writeObject(mapa);
-		
-		fout = new FileOutputStream("src/labos1/analizator/states.ser");
-		oos = new ObjectOutputStream(fout);
 		oos.writeObject(LAStates);
 		
+		fout.close();
 		fout = new FileOutputStream("src/labos1/analizator/items.ser");
 		oos = new ObjectOutputStream(fout);
 		oos.writeObject(lexItems);
 		
+		fout.close();
 		fout = new FileOutputStream("src/labos1/analizator/rules.ser");
 		oos = new ObjectOutputStream(fout);
 		oos.writeObject(rules);
 
+		fout.close();
+		oos.close();
+		
 	}
 	
 	public static void main(String[] args) throws IOException {
@@ -130,8 +134,7 @@ public class Generator {
 		
 		for (int i = 0; i < LAStates.size(); ++i) System.out.println(LAStates.get(i));
 		for (int i = 0; i < lexItems.size(); ++i) System.out.println(lexItems.get(i));
-		
-		
+			
 		outputCollections();
 				
 	}
