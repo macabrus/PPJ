@@ -12,6 +12,7 @@ import java.util.ArrayList;
 import java.util.Map;
 import java.util.TreeMap;
 
+import labos1.Automaton;
 import labos1.Rule;
 
 public class Foo {
@@ -46,10 +47,10 @@ public class Foo {
 		buffer = new BufferedInputStream(file);
 		input = new ObjectInputStream(buffer);
 
-		// LAitems = (ArrayList<String>) input.readObject();
-		// for (String string : LAitems) {
-		// System.out.println(string);
-		// }
+		LAitems = (ArrayList<String>) input.readObject();
+		for (String string : LAitems) {
+			System.out.println(string);
+		}
 	}
 
 	private static void inputRules() throws IOException, ClassNotFoundException {
@@ -103,18 +104,18 @@ public class Foo {
 	static int maxPos = 0;
 	static int npos = 0;
 	static int index = 0;
+	static int line = 0;
 
 	/**
 	 * Metoda koja isprobava mijenjati stanje svim raspolozivim automatima tako
 	 * da im preda trenutni procitani znak.
 	 * @param c
-	 * @param aut Lista raspolozivih automata
 	 * @return Vraca true ako postoji automat koji prihvaca znak
 	 */
 	static boolean feed(char c) {
 		boolean sol = false;
-		index = -1;
 		for (int i = tmpAut.size() - 1; i >= 0; i--) {
+			// koji index
 			int koji = tmpAut.get(i);
 			rules.get(koji).getAutomaton().makeTransitions(c);
 
@@ -167,6 +168,10 @@ public class Foo {
 		System.out.println("automati iz pocetnog :");
 		System.out.println(availableAut.get(state));
 
+		System.out.println(rules.get(6).getAutomaton().getRegex());
+		rules.get(6).getAutomaton().makeTransitions('3');
+		System.out.println(rules.get(6).getAutomaton().isAccepted());
+
 		inputSource();
 		// pocni!!!
 
@@ -182,13 +187,6 @@ public class Foo {
 			// nadji best match automat
 			findBestMatch();
 
-			System.out.println("index " + index);
-			System.out.println("maxPos " + maxPos);
-
-			// maknuti ovo, debug
-			if (maxPos == -1)
-				break;
-
 			if (maxPos == -1) {
 				// nijedan automat ne prihvaca nista
 				// oporavak od pogreske
@@ -196,14 +194,46 @@ public class Foo {
 				continue;
 			}
 
+			npos = maxPos + 1;
+
 			// inace smo nasli automat i varijabla index oznacava koji tocno
 			// automat
+//			System.out.println("indeks akcija: " + index);
 			ArrayList<String> actions = rules.get(index).getActions();
 			// ispuni akcije!
 
-			System.out.println(state);
-			break;
+			for (String action : actions) {
 
+				if (action.equals("{") || action.equals("}"))
+					continue;
+
+				if (LAitems.contains(action)) {
+					// leksem je, ispisi ga
+					// prvi argument je ili leksem ili -
+					System.out.println(action + " " + (line + 1) + " " + source.substring(pos, npos));
+				}
+
+				if (action.split(" ")[0].equals("UDJI_U_STANJE")) {
+					state = action.split(" ")[1];
+				}
+
+				if (action.split(" ")[0].equals("VRATI_SE")) {
+					// promijeni poziciju
+					npos = pos + Integer.parseInt(action.split(" ")[1]);
+				}
+
+				if (action.equals("NOVI_REDAK")) {
+					++line;
+				}
+
+				if (action.equals("-")) {
+					// nesto
+				}
+			}
+
+//			System.out.println(state);
+			pos = npos;
+//			break;
 		}
 
 	}
