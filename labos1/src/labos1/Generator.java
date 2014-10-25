@@ -131,12 +131,21 @@ public class Generator {
 	public static void main(String[] args) throws IOException {
 		
 		parseInput();
-		
-		for (int i = 0; i < LAStates.size(); ++i) System.out.println(LAStates.get(i));
-		for (int i = 0; i < lexItems.size(); ++i) System.out.println(lexItems.get(i));
-			
 		outputCollections();
-				
+		
+		Automaton a1 = new Automaton("ABC");
+		a1.printEverything();
+		
+		a1 = new Automaton("A|B|C");
+		a1.printEverything();
+			
+		
+		for (Rule R : rules) {
+			R.getAutomaton().printEverything();
+			System.out.println("----------------------------");
+		}
+		
+		
 	}
 	
 }

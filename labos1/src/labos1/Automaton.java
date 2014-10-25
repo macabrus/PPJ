@@ -21,7 +21,12 @@ public class Automaton implements Serializable {
 			this.fst = fst;
 			this.snd = snd;
 		}
-
+		
+		@Override
+		public String toString() {
+			return this.fst + " -> " + this.snd;
+		}
+		
 		@Override
 		public boolean equals(Object obj) {
 			return ((Pair) obj).fst == this.fst && ((Pair) obj).snd == this.snd;
@@ -46,6 +51,11 @@ public class Automaton implements Serializable {
 			this.c = c;
 		}
 
+		@Override
+		public String toString() {
+			return c + ": " + this.fst + " -> " + this.snd;
+		}
+		
 		@Override
 		public boolean equals(Object obj) {
 			return ((Transition) obj).fst == this.fst && ((Transition) obj).snd == this.snd
@@ -114,6 +124,22 @@ public class Automaton implements Serializable {
 	}
 
 	/**
+	 * Debug metoda, slobodno zanemariti 
+	 */
+	public void printEverything() {
+		
+		System.out.println("Pocetno stanje: " + this.getStartingState());
+		System.out.println("Zavrsno stanje: " + this.getFinalState());
+		
+		System.out.println("\nPrijelazi (znak: stanje1 -> stanje2): ");
+		for (Transition T : transitions) System.out.println(T);
+		
+		System.out.println("\nEpsilon prijelazi (stanje1 -> stanje2): " );
+		for (Pair p : epsTransitions) System.out.println(p);
+		
+	}
+	
+	/**
 	 * radi prijelaze s obzirom na ucitani znak. Znak '$' oznacava epsilon.
 	 * @param c
 	 */
@@ -164,15 +190,12 @@ public class Automaton implements Serializable {
 	 * @return true ako je operator, inace false.
 	 */
 	private boolean isOperator(int index, String regex) {
-		int cnt = 0;
-		while (index > 0 && regex.charAt(index) == '\\') {
+		int cnt = 0; --index;
+		while (index >= 0 && regex.charAt(index) == '\\') {
 			++cnt;
 			--index;
 		}
-		if (cnt % 2 == 0)
-			return true;
-		else
-			return false;
+		return cnt % 2 == 0;
 	}
 
 	/**
@@ -239,7 +262,7 @@ public class Automaton implements Serializable {
 			for (String choice : choices) {
 				Pair tmp = constructAutomaton(choice);
 				addEpsilonTransition(leftState, tmp.fst);
-				addEpsilonTransition(rightState, tmp.snd);
+				addEpsilonTransition(tmp.snd, rightState);
 			}
 			return new Pair(leftState, rightState);
 		}
@@ -252,6 +275,7 @@ public class Automaton implements Serializable {
 			int l = -1, r = -1;
 			if (escaped) {
 
+				escaped = false;
 				char transChar = regex.charAt(i);
 				if (regex.charAt(i) == 't')
 					transChar = '\t';
@@ -296,10 +320,10 @@ public class Automaton implements Serializable {
 				l = requestNewState();
 				r = requestNewState();
 
-				addEpsilonTransition(_l, l);
+				addEpsilonTransition(l, _l);
 				addEpsilonTransition(_r, r);
 				addEpsilonTransition(l, r);
-				addEpsilonTransition(_l, _r);
+				addEpsilonTransition(_r, _l);
 
 				++i;
 
