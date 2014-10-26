@@ -48,9 +48,9 @@ public class Foo {
 		input = new ObjectInputStream(buffer);
 
 		LAitems = (ArrayList<String>) input.readObject();
-		for (String string : LAitems) {
-			System.out.println(string);
-		}
+//		for (String string : LAitems) {
+//			System.out.println(string);
+//		}
 	}
 
 	private static void inputRules() throws IOException, ClassNotFoundException {
@@ -161,17 +161,6 @@ public class Foo {
 		generateAvailableAutomatons();
 		state = LAstates.get(0);
 
-		// System.out.println("svi automati: ");
-		// for (Rule rule : rules) {
-		// System.out.println(rule.getAutomaton());
-		// }
-		System.out.println("automati iz pocetnog :");
-		System.out.println(availableAut.get(state));
-
-		System.out.println(rules.get(6).getAutomaton().getRegex());
-		rules.get(6).getAutomaton().makeTransitions('3');
-		System.out.println(rules.get(6).getAutomaton().isAccepted());
-
 		inputSource();
 		// pocni!!!
 
@@ -180,9 +169,6 @@ public class Foo {
 
 			// dohvati sve automate iz trenutnog stanja
 			tmpAut = new ArrayList<>(availableAut.get(state));
-			// for (Integer i : tmpAut) {
-			// System.out.println(rules.get(i).getAutomaton());
-			// }
 
 			// nadji best match automat
 			findBestMatch();
