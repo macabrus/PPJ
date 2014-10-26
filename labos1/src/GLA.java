@@ -24,8 +24,8 @@ public class GLA {
 
 	public static void parseInput() throws IOException {
 
-		BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
-//		BufferedReader br = new BufferedReader(new InputStreamReader(new FileInputStream("test.lan")));
+//		BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
+		BufferedReader br = new BufferedReader(new InputStreamReader(new FileInputStream("test.lan")));
 		String currLine;
 
 		while ((currLine = br.readLine()) != null) {
@@ -110,17 +110,17 @@ public class GLA {
 
 	private static void outputCollections() throws IOException {
 
-		FileOutputStream fout = new FileOutputStream("analizator/states.ser");
+		FileOutputStream fout = new FileOutputStream("src/analizator/states.ser");
 		ObjectOutputStream oos = new ObjectOutputStream(fout);
 		oos.writeObject(LAStates);
 
 		fout.close();
-		fout = new FileOutputStream("analizator/items.ser");
+		fout = new FileOutputStream("src/analizator/items.ser");
 		oos = new ObjectOutputStream(fout);
 		oos.writeObject(lexItems);
 
 		fout.close();
-		fout = new FileOutputStream("analizator/rules.ser");
+		fout = new FileOutputStream("src/analizator/rules.ser");
 		oos = new ObjectOutputStream(fout);
 		oos.writeObject(rules);
 

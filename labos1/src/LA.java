@@ -1,5 +1,3 @@
-package analizator;
-
 import java.io.BufferedInputStream;
 import java.io.BufferedReader;
 import java.io.FileInputStream;
@@ -31,7 +29,7 @@ public class LA {
 
 	@SuppressWarnings("unchecked")
 	private static void inputStates() throws IOException, ClassNotFoundException {
-		file = new FileInputStream("states.ser");
+		file = new FileInputStream("src/analizator/states.ser");
 		buffer = new BufferedInputStream(file);
 		input = new ObjectInputStream(buffer);
 		LAstates = (ArrayList<String>) input.readObject();
@@ -42,7 +40,7 @@ public class LA {
 
 	@SuppressWarnings("unchecked")
 	private static void inputItems() throws IOException, ClassNotFoundException {
-		file = new FileInputStream("items.ser");
+		file = new FileInputStream("src/analizator/items.ser");
 		buffer = new BufferedInputStream(file);
 		input = new ObjectInputStream(buffer);
 
@@ -51,7 +49,7 @@ public class LA {
 
 	@SuppressWarnings("unchecked")
 	private static void inputRules() throws IOException, ClassNotFoundException {
-		file = new FileInputStream("rules.ser");
+		file = new FileInputStream("src/analizator/rules.ser");
 		buffer = new BufferedInputStream(file);
 		input = new ObjectInputStream(buffer);
 
@@ -83,9 +81,8 @@ public class LA {
 	}
 
 	private static void inputSource() throws IOException {
-		BufferedReader stdin = new BufferedReader(new InputStreamReader(System.in));
-		// BufferedReader stdin = new BufferedReader(new InputStreamReader(new
-		// FileInputStream("test.in")));
+//		BufferedReader stdin = new BufferedReader(new InputStreamReader(System.in));
+		BufferedReader stdin = new BufferedReader(new InputStreamReader(new FileInputStream("test.in")));
 		String line = "";
 		while (true) {
 			line = stdin.readLine();
