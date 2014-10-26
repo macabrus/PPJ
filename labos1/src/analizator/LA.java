@@ -31,7 +31,7 @@ public class LA {
 
 	@SuppressWarnings("unchecked")
 	private static void inputStates() throws IOException, ClassNotFoundException {
-		file = new FileInputStream("src/analizator/states.ser");
+		file = new FileInputStream("states.ser");
 		buffer = new BufferedInputStream(file);
 		input = new ObjectInputStream(buffer);
 		LAstates = (ArrayList<String>) input.readObject();
@@ -42,7 +42,7 @@ public class LA {
 
 	@SuppressWarnings("unchecked")
 	private static void inputItems() throws IOException, ClassNotFoundException {
-		file = new FileInputStream("src/analizator/items.ser");
+		file = new FileInputStream("items.ser");
 		buffer = new BufferedInputStream(file);
 		input = new ObjectInputStream(buffer);
 
@@ -51,7 +51,7 @@ public class LA {
 
 	@SuppressWarnings("unchecked")
 	private static void inputRules() throws IOException, ClassNotFoundException {
-		file = new FileInputStream("src/analizator/rules.ser");
+		file = new FileInputStream("rules.ser");
 		buffer = new BufferedInputStream(file);
 		input = new ObjectInputStream(buffer);
 
