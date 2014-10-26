@@ -48,21 +48,6 @@ public class Foo {
 		input = new ObjectInputStream(buffer);
 
 		LAitems = (ArrayList<String>) input.readObject();
-<<<<<<< Updated upstream
-<<<<<<< Updated upstream
-//		for (String string : LAitems) {
-//			System.out.println(string);
-//		}
-=======
-		// for (String string : LAitems) {
-		// System.out.println(string);
-		// }
->>>>>>> Stashed changes
-=======
-		// for (String string : LAitems) {
-		// System.out.println(string);
-		// }
->>>>>>> Stashed changes
 	}
 
 	private static void inputRules() throws IOException, ClassNotFoundException {
