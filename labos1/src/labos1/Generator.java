@@ -1,13 +1,13 @@
 package labos1;
 
 import java.io.BufferedReader;
+import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.ObjectOutputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.regex.Matcher;
@@ -24,7 +24,8 @@ public class Generator {
 	
 	public static void parseInput() throws IOException {
 		
-		BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
+//		BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
+		BufferedReader br = new BufferedReader(new InputStreamReader(new FileInputStream("generator.dummy.in.2")));
 		String currLine;
 		
 		while ((currLine = br.readLine()) != null) {
@@ -68,12 +69,13 @@ public class Generator {
 			rules.add(new Rule(state, regAutomaton, actions));
 			
 		}
-		
+		br.close();
 	}
 		
 	/**
 	 * Metoda za debug -- slobodno zanemariti 
 	 */
+	@SuppressWarnings("unused")
 	private static void printDefinitions() {
 		for (RegularDefinition regDef : regDefs) 
 			System.out.println(regDef.getName() + " " + regDef.getDefinition());

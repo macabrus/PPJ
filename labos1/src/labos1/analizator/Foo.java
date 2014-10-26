@@ -12,7 +12,6 @@ import java.util.ArrayList;
 import java.util.Map;
 import java.util.TreeMap;
 
-import labos1.Automaton;
 import labos1.Rule;
 
 public class Foo {
@@ -32,6 +31,7 @@ public class Foo {
 	private static InputStream buffer;
 	private static InputStream file;
 
+	@SuppressWarnings("unchecked")
 	private static void inputStates() throws IOException, ClassNotFoundException {
 		file = new FileInputStream("src/labos1/analizator/states.ser");
 		buffer = new BufferedInputStream(file);
@@ -42,6 +42,7 @@ public class Foo {
 		// }
 	}
 
+	@SuppressWarnings("unchecked")
 	private static void inputItems() throws IOException, ClassNotFoundException {
 		file = new FileInputStream("src/labos1/analizator/items.ser");
 		buffer = new BufferedInputStream(file);
@@ -50,6 +51,7 @@ public class Foo {
 		LAitems = (ArrayList<String>) input.readObject();
 	}
 
+	@SuppressWarnings("unchecked")
 	private static void inputRules() throws IOException, ClassNotFoundException {
 		file = new FileInputStream("src/labos1/analizator/rules.ser");
 		buffer = new BufferedInputStream(file);
@@ -66,7 +68,7 @@ public class Foo {
 	 * indekasa (lol) automata dostupnih iz tog stanja. Indeksi su iz liste
 	 * rules i preko njih dolazimo do automata.
 	 */
-	private static void generateAvailableAutomatons() {
+	private static void generateAvailableAutomata() {
 		// za svako stanje generiraj listu indeksa automata kojima mogu
 		// pristupiti iz njega
 		for (String state : LAstates) {
@@ -83,15 +85,17 @@ public class Foo {
 	}
 
 	private static void inputSource() throws IOException {
-		BufferedReader stdin = new BufferedReader(new InputStreamReader(System.in));
+//		BufferedReader stdin = new BufferedReader(new InputStreamReader(System.in));
+		BufferedReader stdin = new BufferedReader(new InputStreamReader(new FileInputStream("analizator.dummy.in.2")));
 		String line = "";
 		while (true) {
 			line = stdin.readLine();
-			if (line == null || line.equals(""))
+			if (line == null)
 				break;
 			source += line + "\n";
 //			source += line + System.getProperty("line.separator");
 		}
+		stdin.close();
 	}
 
 	// u pocetnom sam stanju
@@ -127,7 +131,7 @@ public class Foo {
 
 	/**
 	 * Metoda koja isprobava najdulji moguci string kao match raspolozivim
-	 * automatima.
+	 * automatima i pamti poziciju do koje smo dosli.
 	 */
 	static void findBestMatch() {
 		maxPos = -1;
@@ -156,14 +160,11 @@ public class Foo {
 		inputItems();
 		inputRules();
 
-		generateAvailableAutomatons();
+		generateAvailableAutomata();
 		state = LAstates.get(0);
 
 		inputSource();
 		// pocni!!!
-
-		// System.out.println(rules.get(10).getAutomaton().getRegex());
-		// rules.get(10).getAutomaton().setRegex("-(\\t|\\n|\\_)*-");
 
 		while (pos < source.length()) {
 			initializeAutomata();
@@ -185,12 +186,10 @@ public class Foo {
 
 			// inace smo nasli automat i varijabla index oznacava koji tocno
 			// automat
-			// System.out.println("indeks akcija: " + index);
 			ArrayList<String> actions = rules.get(index).getActions();
 			// ispuni akcije!
 			
 			for (int i = actions.size() - 1; i >= 0; --i) {
-				
 				String action = actions.get(i);
 
 				if (action.equals("{") || action.equals("}"))
@@ -219,11 +218,8 @@ public class Foo {
 					// nesto
 				}
 			}
-
 //			System.out.println(state);
-			
 			pos = npos;
-			// break;
 		}
 
 	}
