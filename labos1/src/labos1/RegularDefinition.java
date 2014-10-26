@@ -1,5 +1,7 @@
 package labos1;
 
+import java.util.regex.Matcher;
+
 /**
  * 
  * Klasa definira regularnu definiciju kao uređen par (imeDefinicije, definicija). 
@@ -55,7 +57,7 @@ public class RegularDefinition {
 	public void replaceNameWithDefinition(String name, String definition) {
 		this.definition = this.definition.replaceAll(
 				name.replaceAll("\\{", "\\\\\\{").replaceAll("\\}", "\\\\\\}"), 
-				"(" + definition + ")"
+				"(" + Matcher.quoteReplacement(definition) + ")"
 		);		
 	}
 	

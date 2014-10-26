@@ -128,6 +128,8 @@ public class Automaton implements Serializable {
 	 */
 	public void printEverything() {
 		
+		System.out.println("Regex: " + this.regex);
+		
 		System.out.println("Pocetno stanje: " + this.getStartingState());
 		System.out.println("Zavrsno stanje: " + this.getFinalState());
 		

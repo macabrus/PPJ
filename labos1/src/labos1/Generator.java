@@ -10,6 +10,7 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.regex.Matcher;
 import java.lang.String;
 
 public class Generator {
@@ -100,7 +101,7 @@ public class Generator {
 		for (int i = 0; i < regDefs.size(); ++i) {
 			regex = regex.replaceAll(
 					regDefs.get(i).getName().replaceAll("\\{", "\\\\\\{").replaceAll("\\}", "\\\\\\}"), 
-					"(" + regDefs.get(i).getDefinition() + ")"
+					"(" + Matcher.quoteReplacement(regDefs.get(i).getDefinition()) + ")"
 			);	
 		}
 		return regex;
