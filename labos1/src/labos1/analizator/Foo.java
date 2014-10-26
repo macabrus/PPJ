@@ -89,7 +89,8 @@ public class Foo {
 			line = stdin.readLine();
 			if (line == null || line.equals(""))
 				break;
-			source += line + System.getProperty("line.separator");
+			source += line + "\n";
+//			source += line + System.getProperty("line.separator");
 		}
 	}
 
@@ -187,8 +188,10 @@ public class Foo {
 			// System.out.println("indeks akcija: " + index);
 			ArrayList<String> actions = rules.get(index).getActions();
 			// ispuni akcije!
-
-			for (String action : actions) {
+			
+			for (int i = actions.size() - 1; i >= 0; --i) {
+				
+				String action = actions.get(i);
 
 				if (action.equals("{") || action.equals("}"))
 					continue;
@@ -217,6 +220,8 @@ public class Foo {
 				}
 			}
 
+//			System.out.println(state);
+			
 			pos = npos;
 			// break;
 		}
