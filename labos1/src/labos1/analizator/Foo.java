@@ -49,9 +49,15 @@ public class Foo {
 
 		LAitems = (ArrayList<String>) input.readObject();
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
 //		for (String string : LAitems) {
 //			System.out.println(string);
 //		}
+=======
+		// for (String string : LAitems) {
+		// System.out.println(string);
+		// }
+>>>>>>> Stashed changes
 =======
 		// for (String string : LAitems) {
 		// System.out.println(string);
