@@ -25,7 +25,7 @@ public class Generator {
 	public static void parseInput() throws IOException {
 		
 //		BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
-		BufferedReader br = new BufferedReader(new InputStreamReader(new FileInputStream("generator.dummy.in.2")));
+		BufferedReader br = new BufferedReader(new InputStreamReader(new FileInputStream("test.lan")));
 		String currLine;
 		
 		while ((currLine = br.readLine()) != null) {
@@ -136,11 +136,11 @@ public class Generator {
 		parseInput();
 		outputCollections();
 		
-		Automaton a1 = new Automaton("ABC");
-		a1.printEverything();
-		
-		a1 = new Automaton("A|B|C");
-		a1.printEverything();
+//		Automaton a1 = new Automaton("ABC");
+//		a1.printEverything();
+//		
+//		a1 = new Automaton("A|B|C");
+//		a1.printEverything();
 			
 		
 		for (Rule R : rules) {

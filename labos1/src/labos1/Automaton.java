@@ -349,4 +349,9 @@ public class Automaton implements Serializable {
 		this.regex = regex;
 	}
 
+	public ArrayList<Integer> getActiveStates() {
+		return activeStates;
+	}
+	
+
 }

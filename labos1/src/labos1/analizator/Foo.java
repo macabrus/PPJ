@@ -12,6 +12,7 @@ import java.util.ArrayList;
 import java.util.Map;
 import java.util.TreeMap;
 
+import labos1.Automaton;
 import labos1.Rule;
 
 public class Foo {
@@ -86,7 +87,7 @@ public class Foo {
 
 	private static void inputSource() throws IOException {
 //		BufferedReader stdin = new BufferedReader(new InputStreamReader(System.in));
-		BufferedReader stdin = new BufferedReader(new InputStreamReader(new FileInputStream("analizator.dummy.in.2")));
+		BufferedReader stdin = new BufferedReader(new InputStreamReader(new FileInputStream("test.in")));
 		String line = "";
 		while (true) {
 			line = stdin.readLine();
@@ -107,6 +108,7 @@ public class Foo {
 	static int npos = 0;
 	static int index = 0;
 	static int line = 0;
+	static int good = 0;
 
 	/**
 	 * Metoda koja isprobava mijenjati stanje svim raspolozivim automatima tako
@@ -116,6 +118,7 @@ public class Foo {
 	 */
 	static boolean feed(char c) {
 		boolean sol = false;
+		int ngood = 0;
 		for (int i = tmpAut.size() - 1; i >= 0; i--) {
 			// koji index
 			int koji = tmpAut.get(i);
@@ -125,7 +128,11 @@ public class Foo {
 				sol = true;
 				index = koji;
 			}
+			if(!rules.get(koji).getAutomaton().getActiveStates().isEmpty()) {
+				ngood++;
+			}
 		}
+		good = ngood;
 		return sol;
 	}
 
@@ -135,7 +142,10 @@ public class Foo {
 	 */
 	static void findBestMatch() {
 		maxPos = -1;
+		// na pocetku su svi dohvatljivi automati dobri
+		good = tmpAut.size();
 		for (int i = pos; i < source.length(); i++) {
+			if(good == 0) break;
 			// ako postoji automat koji moze prozvakat sve ovo dosad
 			if (feed(source.charAt(i))) {
 				maxPos = i;
@@ -147,9 +157,12 @@ public class Foo {
 	 * Metoda koja inicijalizira sve automate na pocetno stanje.
 	 */
 	static void initializeAutomata() {
-		for (Rule rule : rules) {
-			rule.getAutomaton().initialize();
+		for(int i = 0; i < tmpAut.size(); i++) {
+			rules.get(tmpAut.get(i)).getAutomaton().initialize();
 		}
+//		for (Rule rule : rules) {
+//			rule.getAutomaton().initialize();
+//		}
 	}
 
 	// lista INDEKSA automata dostupnih iz trenutnog stanja
@@ -165,12 +178,14 @@ public class Foo {
 
 		inputSource();
 		// pocni!!!
-
+		
 		while (pos < source.length()) {
-			initializeAutomata();
 
 			// dohvati sve automate iz trenutnog stanja
 			tmpAut = new ArrayList<>(availableAut.get(state));
+
+			// inicijaliziraj automate dohvatljive iz TRENUTNOG stanja
+			initializeAutomata();
 
 			// nadji best match automat
 			findBestMatch();
@@ -181,6 +196,8 @@ public class Foo {
 				pos++;
 				continue;
 			}
+			
+			System.out.println(maxPos + " " + rules.get(index).getAutomaton().getRegex());
 
 			npos = maxPos + 1;
 
