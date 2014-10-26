@@ -1,4 +1,4 @@
-package labos1.analizator;
+package analizator;
 
 import java.io.BufferedInputStream;
 import java.io.BufferedReader;
@@ -12,10 +12,7 @@ import java.util.ArrayList;
 import java.util.Map;
 import java.util.TreeMap;
 
-import labos1.Automaton;
-import labos1.Rule;
-
-public class Foo {
+public class LA {
 
 	// temp strukture
 	static ArrayList<String> LAstates = new ArrayList<>();
@@ -34,7 +31,7 @@ public class Foo {
 
 	@SuppressWarnings("unchecked")
 	private static void inputStates() throws IOException, ClassNotFoundException {
-		file = new FileInputStream("src/labos1/analizator/states.ser");
+		file = new FileInputStream("src/analizator/states.ser");
 		buffer = new BufferedInputStream(file);
 		input = new ObjectInputStream(buffer);
 		LAstates = (ArrayList<String>) input.readObject();
@@ -45,7 +42,7 @@ public class Foo {
 
 	@SuppressWarnings("unchecked")
 	private static void inputItems() throws IOException, ClassNotFoundException {
-		file = new FileInputStream("src/labos1/analizator/items.ser");
+		file = new FileInputStream("src/analizator/items.ser");
 		buffer = new BufferedInputStream(file);
 		input = new ObjectInputStream(buffer);
 
@@ -54,7 +51,7 @@ public class Foo {
 
 	@SuppressWarnings("unchecked")
 	private static void inputRules() throws IOException, ClassNotFoundException {
-		file = new FileInputStream("src/labos1/analizator/rules.ser");
+		file = new FileInputStream("src/analizator/rules.ser");
 		buffer = new BufferedInputStream(file);
 		input = new ObjectInputStream(buffer);
 
@@ -86,15 +83,16 @@ public class Foo {
 	}
 
 	private static void inputSource() throws IOException {
-//		BufferedReader stdin = new BufferedReader(new InputStreamReader(System.in));
-		BufferedReader stdin = new BufferedReader(new InputStreamReader(new FileInputStream("test.in")));
+		BufferedReader stdin = new BufferedReader(new InputStreamReader(System.in));
+		// BufferedReader stdin = new BufferedReader(new InputStreamReader(new
+		// FileInputStream("test.in")));
 		String line = "";
 		while (true) {
 			line = stdin.readLine();
 			if (line == null)
 				break;
 			source += line + "\n";
-//			source += line + System.getProperty("line.separator");
+			// source += line + System.getProperty("line.separator");
 		}
 		stdin.close();
 	}
@@ -125,10 +123,11 @@ public class Foo {
 			rules.get(koji).getAutomaton().makeTransitions(c);
 
 			if (rules.get(koji).getAutomaton().isAccepted()) {
+				// predji na njega ako je bio aktivan od pocetka
 				sol = true;
 				index = koji;
 			}
-			if(!rules.get(koji).getAutomaton().getActiveStates().isEmpty()) {
+			if (!rules.get(koji).getAutomaton().getActiveStates().isEmpty()) {
 				ngood++;
 			}
 		}
@@ -145,7 +144,8 @@ public class Foo {
 		// na pocetku su svi dohvatljivi automati dobri
 		good = tmpAut.size();
 		for (int i = pos; i < source.length(); i++) {
-			if(good == 0) break;
+			if (good == 0)
+				break;
 			// ako postoji automat koji moze prozvakat sve ovo dosad
 			if (feed(source.charAt(i))) {
 				maxPos = i;
@@ -157,12 +157,12 @@ public class Foo {
 	 * Metoda koja inicijalizira sve automate na pocetno stanje.
 	 */
 	static void initializeAutomata() {
-		for(int i = 0; i < tmpAut.size(); i++) {
+		for (int i = 0; i < tmpAut.size(); i++) {
 			rules.get(tmpAut.get(i)).getAutomaton().initialize();
 		}
-//		for (Rule rule : rules) {
-//			rule.getAutomaton().initialize();
-//		}
+		// for (Rule rule : rules) {
+		// rule.getAutomaton().initialize();
+		// }
 	}
 
 	// lista INDEKSA automata dostupnih iz trenutnog stanja
@@ -178,7 +178,7 @@ public class Foo {
 
 		inputSource();
 		// pocni!!!
-		
+
 		while (pos < source.length()) {
 
 			// dohvati sve automate iz trenutnog stanja
@@ -196,8 +196,6 @@ public class Foo {
 				pos++;
 				continue;
 			}
-			
-			System.out.println(maxPos + " " + rules.get(index).getAutomaton().getRegex());
 
 			npos = maxPos + 1;
 
@@ -205,7 +203,7 @@ public class Foo {
 			// automat
 			ArrayList<String> actions = rules.get(index).getActions();
 			// ispuni akcije!
-			
+
 			for (int i = actions.size() - 1; i >= 0; --i) {
 				String action = actions.get(i);
 
@@ -235,7 +233,7 @@ public class Foo {
 					// nesto
 				}
 			}
-//			System.out.println(state);
+			// System.out.println(state);
 			pos = npos;
 		}
 

@@ -1,10 +1,11 @@
-package labos1;
+package analizator;
+
 
 import java.util.regex.Matcher;
 
 /**
  * 
- * Klasa definira regularnu definiciju kao uređen par (imeDefinicije, definicija). 
+ * Klasa definira regularnu definiciju kao uredjen par (imeDefinicije, definicija). 
  * 
  * @author Ivan Paljak
  *

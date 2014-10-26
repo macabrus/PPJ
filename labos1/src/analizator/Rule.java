@@ -1,4 +1,5 @@
-package labos1;
+package analizator;
+
 
 import java.io.Serializable;
 import java.util.ArrayList;

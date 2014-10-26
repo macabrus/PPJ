@@ -1,4 +1,4 @@
-package labos1;
+
 
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -11,6 +11,7 @@ import java.util.ArrayList;
 public class Automaton implements Serializable {
 
 	private static final long serialVersionUID = 1L;
+	private int acc;
 
 	class Pair implements Serializable {
 
@@ -21,12 +22,12 @@ public class Automaton implements Serializable {
 			this.fst = fst;
 			this.snd = snd;
 		}
-		
+
 		@Override
 		public String toString() {
 			return this.fst + " -> " + this.snd;
 		}
-		
+
 		@Override
 		public boolean equals(Object obj) {
 			return ((Pair) obj).fst == this.fst && ((Pair) obj).snd == this.snd;
@@ -55,7 +56,7 @@ public class Automaton implements Serializable {
 		public String toString() {
 			return c + ": " + this.fst + " -> " + this.snd;
 		}
-		
+
 		@Override
 		public boolean equals(Object obj) {
 			return ((Transition) obj).fst == this.fst && ((Transition) obj).snd == this.snd
@@ -118,29 +119,32 @@ public class Automaton implements Serializable {
 	 * Inicijalizira automat
 	 */
 	public void initialize() {
+//		acc = 0;
 		activeStates = new ArrayList<>();
 		activeStates.add(this.getStartingState());
 		makeEpsilonTransitions();
 	}
 
 	/**
-	 * Debug metoda, slobodno zanemariti 
+	 * Debug metoda, slobodno zanemariti
 	 */
 	public void printEverything() {
-		
+
 		System.out.println("Regex: " + this.regex);
-		
+
 		System.out.println("Pocetno stanje: " + this.getStartingState());
 		System.out.println("Zavrsno stanje: " + this.getFinalState());
-		
+
 		System.out.println("\nPrijelazi (znak: stanje1 -> stanje2): ");
-		for (Transition T : transitions) System.out.println(T);
-		
-		System.out.println("\nEpsilon prijelazi (stanje1 -> stanje2): " );
-		for (Pair p : epsTransitions) System.out.println(p);
-		
+		for (Transition T : transitions)
+			System.out.println(T);
+
+		System.out.println("\nEpsilon prijelazi (stanje1 -> stanje2): ");
+		for (Pair p : epsTransitions)
+			System.out.println(p);
+
 	}
-	
+
 	/**
 	 * radi prijelaze s obzirom na ucitani znak. Znak '$' oznacava epsilon.
 	 * @param c
@@ -192,7 +196,8 @@ public class Automaton implements Serializable {
 	 * @return true ako je operator, inace false.
 	 */
 	private boolean isOperator(int index, String regex) {
-		int cnt = 0; --index;
+		int cnt = 0;
+		--index;
 		while (index >= 0 && regex.charAt(index) == '\\') {
 			++cnt;
 			--index;
@@ -344,7 +349,7 @@ public class Automaton implements Serializable {
 	public String getRegex() {
 		return regex;
 	}
-	
+
 	public void setRegex(String regex) {
 		this.regex = regex;
 	}
@@ -352,6 +357,15 @@ public class Automaton implements Serializable {
 	public ArrayList<Integer> getActiveStates() {
 		return activeStates;
 	}
-	
+
+	public void increment() {
+//		if (activeStates.contains(states))
+		if(!activeStates.isEmpty())
+			++acc;
+	}
+
+	public int getAcc() {
+		return this.acc;
+	}
 
 }

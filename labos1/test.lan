@@ -1,23 +1,68 @@
-%X S_p
-%L UVIJEK NIKAD
-<S_p>abcd*
+%X S_a S_b S_acc S_dead S_nl
+%L OK FAIL
+<S_a>a
 {
-UVIJEK
+-
+UDJI_U_STANJE S_b
 }
-<S_p>abcd*
+<S_a>b
 {
-NIKAD
+-
+UDJI_U_STANJE S_dead
 }
-<S_p>xyz*
+<S_a>k
 {
-UVIJEK
+FAIL
+UDJI_U_STANJE S_nl
 }
-<S_p>xyz*
+<S_b>a
 {
-NIKAD
+-
+UDJI_U_STANJE S_dead
 }
-<S_p>\n
+<S_b>b
+{
+-
+UDJI_U_STANJE S_acc
+}
+<S_b>k
+{
+FAIL
+UDJI_U_STANJE S_nl
+}
+<S_acc>a
+{
+-
+UDJI_U_STANJE S_dead
+}
+<S_acc>b
+{
+-
+UDJI_U_STANJE S_dead
+}
+<S_acc>k
+{
+OK
+UDJI_U_STANJE S_nl
+}
+<S_dead>a
+{
+-
+UDJI_U_STANJE S_dead
+}
+<S_dead>b
+{
+-
+UDJI_U_STANJE S_dead
+}
+<S_dead>k
+{
+FAIL
+UDJI_U_STANJE S_nl
+}
+<S_nl>nl($|\n)
 {
 -
 NOVI_REDAK
+UDJI_U_STANJE S_a
 }
