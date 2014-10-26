@@ -48,9 +48,15 @@ public class Foo {
 		input = new ObjectInputStream(buffer);
 
 		LAitems = (ArrayList<String>) input.readObject();
+<<<<<<< Updated upstream
 //		for (String string : LAitems) {
 //			System.out.println(string);
 //		}
+=======
+		// for (String string : LAitems) {
+		// System.out.println(string);
+		// }
+>>>>>>> Stashed changes
 	}
 
 	private static void inputRules() throws IOException, ClassNotFoundException {
@@ -164,6 +170,9 @@ public class Foo {
 		inputSource();
 		// pocni!!!
 
+		// System.out.println(rules.get(10).getAutomaton().getRegex());
+		// rules.get(10).getAutomaton().setRegex("-(\\t|\\n|\\_)*-");
+
 		while (pos < source.length()) {
 			initializeAutomata();
 
@@ -184,7 +193,7 @@ public class Foo {
 
 			// inace smo nasli automat i varijabla index oznacava koji tocno
 			// automat
-//			System.out.println("indeks akcija: " + index);
+			// System.out.println("indeks akcija: " + index);
 			ArrayList<String> actions = rules.get(index).getActions();
 			// ispuni akcije!
 
@@ -217,9 +226,8 @@ public class Foo {
 				}
 			}
 
-//			System.out.println(state);
 			pos = npos;
-//			break;
+			// break;
 		}
 
 	}

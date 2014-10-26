@@ -344,5 +344,9 @@ public class Automaton implements Serializable {
 	public String getRegex() {
 		return regex;
 	}
+	
+	public void setRegex(String regex) {
+		this.regex = regex;
+	}
 
 }
