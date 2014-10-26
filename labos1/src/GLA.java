@@ -1,15 +1,11 @@
 
-
 import java.io.BufferedReader;
-import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.ObjectOutputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.HashMap;
-import java.util.Map;
 import java.util.regex.Matcher;
 import java.lang.String;
 
@@ -20,12 +16,12 @@ public class GLA {
 	private static ArrayList<String> lexItems = new ArrayList<>();
 	private static ArrayList<Rule> rules = new ArrayList<>();
 
-	private static Map<String, Automaton> mapa = new HashMap<>();
+	// private static Map<String, Automaton> mapa = new HashMap<>();
 
 	public static void parseInput() throws IOException {
 
-//		BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
-		BufferedReader br = new BufferedReader(new InputStreamReader(new FileInputStream("test.lan")));
+		BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
+//		BufferedReader br = new BufferedReader(new InputStreamReader(new FileInputStream("test.lan")));
 		String currLine;
 
 		while ((currLine = br.readLine()) != null) {
@@ -61,12 +57,14 @@ public class GLA {
 
 			Automaton regAutomaton = null;
 
-			if (!mapa.containsKey(regex)) {
-				regAutomaton = new Automaton(regex);
-				mapa.put(regex, regAutomaton);
-			} else {
-				regAutomaton = mapa.get(regex);
-			}
+			regAutomaton = new Automaton(regex);
+
+			// if (!mapa.containsKey(regex)) {
+			// regAutomaton = new Automaton(regex);
+			// mapa.put(regex, regAutomaton);
+			// } else {
+			// regAutomaton = mapa.get(regex);
+			// }
 
 			rules.add(new Rule(state, regAutomaton, actions));
 
@@ -110,17 +108,17 @@ public class GLA {
 
 	private static void outputCollections() throws IOException {
 
-		FileOutputStream fout = new FileOutputStream("src/analizator/states.ser");
+		FileOutputStream fout = new FileOutputStream("analizator/states.ser");
 		ObjectOutputStream oos = new ObjectOutputStream(fout);
 		oos.writeObject(LAStates);
 
 		fout.close();
-		fout = new FileOutputStream("src/analizator/items.ser");
+		fout = new FileOutputStream("analizator/items.ser");
 		oos = new ObjectOutputStream(fout);
 		oos.writeObject(lexItems);
 
 		fout.close();
-		fout = new FileOutputStream("src/analizator/rules.ser");
+		fout = new FileOutputStream("analizator/rules.ser");
 		oos = new ObjectOutputStream(fout);
 		oos.writeObject(rules);
 

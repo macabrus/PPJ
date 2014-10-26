@@ -29,18 +29,15 @@ public class LA {
 
 	@SuppressWarnings("unchecked")
 	private static void inputStates() throws IOException, ClassNotFoundException {
-		file = new FileInputStream("src/analizator/states.ser");
+		file = new FileInputStream("states.ser");
 		buffer = new BufferedInputStream(file);
 		input = new ObjectInputStream(buffer);
 		LAstates = (ArrayList<String>) input.readObject();
-		// for (String string : LAstates) {
-		// System.out.println(string);
-		// }
 	}
 
 	@SuppressWarnings("unchecked")
 	private static void inputItems() throws IOException, ClassNotFoundException {
-		file = new FileInputStream("src/analizator/items.ser");
+		file = new FileInputStream("items.ser");
 		buffer = new BufferedInputStream(file);
 		input = new ObjectInputStream(buffer);
 
@@ -49,19 +46,16 @@ public class LA {
 
 	@SuppressWarnings("unchecked")
 	private static void inputRules() throws IOException, ClassNotFoundException {
-		file = new FileInputStream("src/analizator/rules.ser");
+		file = new FileInputStream("rules.ser");
 		buffer = new BufferedInputStream(file);
 		input = new ObjectInputStream(buffer);
 
 		rules = (ArrayList<Rule>) input.readObject();
-		// for (Rule string : rules) {
-		// System.out.println(string);
-		// }
 	}
 
 	/**
 	 * Metoda koja se poziva na pocetku programa. Za svako stanje napravi listu
-	 * indekasa (lol) automata dostupnih iz tog stanja. Indeksi su iz liste
+	 * indeksa automata dostupnih iz tog stanja. Indeksi su iz liste
 	 * rules i preko njih dolazimo do automata.
 	 */
 	private static void generateAvailableAutomata() {
@@ -80,21 +74,24 @@ public class LA {
 		}
 	}
 
+	/**
+	 * Metoda koja ucitava ulazni kod programa.
+	 * @throws IOException
+	 */
 	private static void inputSource() throws IOException {
-//		BufferedReader stdin = new BufferedReader(new InputStreamReader(System.in));
-		BufferedReader stdin = new BufferedReader(new InputStreamReader(new FileInputStream("test.in")));
+		BufferedReader stdin = new BufferedReader(new InputStreamReader(System.in));
+//		BufferedReader stdin = new BufferedReader(new InputStreamReader(new FileInputStream("test.in")));
 		String line = "";
 		while (true) {
 			line = stdin.readLine();
 			if (line == null)
 				break;
 			source += line + "\n";
-			// source += line + System.getProperty("line.separator");
 		}
 		stdin.close();
 	}
 
-	// u pocetnom sam stanju
+	// varijabla koja oznacava trenutno stanje analizatora
 	static String state = "";
 	static String source = "";
 
@@ -114,17 +111,23 @@ public class LA {
 	static boolean feed(char c) {
 		boolean sol = false;
 		int ngood = 0;
-		for (int i = tmpAut.size() - 1; i >= 0; i--) {
-			// koji index
-			int koji = tmpAut.get(i);
-			rules.get(koji).getAutomaton().makeTransitions(c);
 
-			if (rules.get(koji).getAutomaton().isAccepted()) {
-				// predji na njega ako je bio aktivan od pocetka
-				sol = true;
-				index = koji;
+		for (int i = tmpAut.size() - 1; i >= 0; i--) {
+			int autIndex = tmpAut.get(i);
+
+			int accBefore = rules.get(autIndex).getAutomaton().getAcc();
+			rules.get(autIndex).getAutomaton().makeTransitions(c);
+			int accAfter = rules.get(autIndex).getAutomaton().getAcc();
+
+			if (accBefore == accAfter) {
+				rules.get(autIndex).getAutomaton().killAutomaton();
 			}
-			if (!rules.get(koji).getAutomaton().getActiveStates().isEmpty()) {
+
+			if (rules.get(autIndex).getAutomaton().isAccepted()) {
+				sol = true;
+				index = autIndex;
+			}
+			if (!rules.get(autIndex).getAutomaton().getActiveStates().isEmpty()) {
 				ngood++;
 			}
 		}
@@ -157,14 +160,17 @@ public class LA {
 		for (int i = 0; i < tmpAut.size(); i++) {
 			rules.get(tmpAut.get(i)).getAutomaton().initialize();
 		}
-		// for (Rule rule : rules) {
-		// rule.getAutomaton().initialize();
-		// }
 	}
 
 	// lista INDEKSA automata dostupnih iz trenutnog stanja
 	static ArrayList<Integer> tmpAut = new ArrayList<>();
 
+	/**
+	 * Glavna metoda koja se pokrece prilikom pokretanja programa.
+	 * @param args
+	 * @throws IOException
+	 * @throws ClassNotFoundException
+	 */
 	public static void main(String[] args) throws IOException, ClassNotFoundException {
 		inputStates();
 		inputItems();
@@ -177,7 +183,6 @@ public class LA {
 		// pocni!!!
 
 		while (pos < source.length()) {
-
 			// dohvati sve automate iz trenutnog stanja
 			tmpAut = new ArrayList<>(availableAut.get(state));
 

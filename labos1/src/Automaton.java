@@ -1,5 +1,3 @@
-
-
 import java.io.Serializable;
 import java.util.ArrayList;
 
@@ -75,6 +73,7 @@ public class Automaton implements Serializable {
 	private int states;
 	private String regex;
 	private Pair P;
+	private boolean chosen;
 
 	ArrayList<Pair> epsTransitions = new ArrayList<>();
 	ArrayList<Transition> transitions = new ArrayList<>();
@@ -91,7 +90,7 @@ public class Automaton implements Serializable {
 	}
 
 	/**
-	 * @return pocetnp stanje automata
+	 * @return pocetno stanje automata
 	 */
 	public int getStartingState() {
 		return P.fst;
@@ -119,10 +118,15 @@ public class Automaton implements Serializable {
 	 * Inicijalizira automat
 	 */
 	public void initialize() {
-//		acc = 0;
+		acc = 0;
+		chosen = true;
 		activeStates = new ArrayList<>();
 		activeStates.add(this.getStartingState());
 		makeEpsilonTransitions();
+	}
+
+	public void killAutomaton() {
+		chosen = false;
 	}
 
 	/**
@@ -150,20 +154,18 @@ public class Automaton implements Serializable {
 	 * @param c
 	 */
 	public void makeTransitions(char c) {
-
-		if (c == '$') {
-			makeEpsilonTransitions();
-			return;
-		}
-
+		boolean foundIt = false;
 		ArrayList<Integer> newStates = new ArrayList<>();
 
 		for (Transition t : transitions) {
 			if (!activeStates.contains(t.fst) || c != t.c)
 				continue;
+			foundIt = true;
 			newStates.add(t.snd);
 		}
 
+		if (foundIt)
+			++acc;
 		this.activeStates = newStates;
 		makeEpsilonTransitions();
 
@@ -359,13 +361,17 @@ public class Automaton implements Serializable {
 	}
 
 	public void increment() {
-//		if (activeStates.contains(states))
-		if(!activeStates.isEmpty())
+		// if (activeStates.contains(states))
+		if (!activeStates.isEmpty())
 			++acc;
 	}
 
 	public int getAcc() {
 		return this.acc;
+	}
+
+	public boolean getChosen() {
+		return this.chosen;
 	}
 
 }
