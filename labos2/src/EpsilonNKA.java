@@ -1,7 +1,4 @@
-import java.awt.List;
 import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Set;
@@ -13,7 +10,7 @@ import java.util.Set;
  */
 public class EpsilonNKA {
 
-	private class State {
+	public class State {
 
 		public Production p;
 		public int dotIndex;
@@ -114,7 +111,7 @@ public class EpsilonNKA {
 
 	}
 
-	private class Transition {
+	public class Transition {
 
 		public State from, to;
 		public String edge;
@@ -208,9 +205,6 @@ public class EpsilonNKA {
 			}
 
 			Set<String> starting = new HashSet<String>();
-			for (String str : beginsWith.getBeginsWith(currentState.afterDot())) {
-				starting.add(new String(str));
-			}
 
 			boolean propagate = false;
 			if (currentState.dotIndex + 1 >= currentState.p.right.size())
@@ -218,10 +212,12 @@ public class EpsilonNKA {
 
 			for (int i = currentState.dotIndex + 1; i < currentState.p.right.size(); ++i) {
 				String currString = currentState.p.right.get(i);
-				if (nonterminal.contains(currString))
-					continue;
-				if (beginsWith.generatesEpsilon(currString) || currString.equals("$"))
-					propagate = true;
+				for (String str : beginsWith.getBeginsWith(currString)) {
+					if (nonterminal.contains(str)) continue;
+					starting.add(new String(str));
+				}
+				if (terminal.contains(currString)) continue;
+				if (beginsWith.generatesEpsilon(currString) || currString.equals("$")) propagate = true;
 			}
 
 			if (propagate) {

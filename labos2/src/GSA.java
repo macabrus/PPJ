@@ -21,7 +21,7 @@ public class GSA {
 	private static void parseInput() throws IOException {
 		// BufferedReader br = new BufferedReader(new
 		// InputStreamReader(System.in));
-		BufferedReader br = new BufferedReader(new InputStreamReader(new FileInputStream("test1.san")));
+		BufferedReader br = new BufferedReader(new InputStreamReader(new FileInputStream("pi.san")));
 		String currLine;
 
 		// input nonterminals
@@ -102,11 +102,17 @@ public class GSA {
 		// getEmptyNonterminals();
 		// getBeginsWith();
 		BeginsWithTable beginsWith = new BeginsWithTable(allChars, nonterminals, grammar);
+		
 		EpsilonNKA eNKA = new EpsilonNKA(nonterminals.get(0), grammar, beginsWith, nonterminals, terminals);
 		eNKA.generateEpsilonNKA();
 		eNKA.outputStates();
 		System.out.println("----");
 		eNKA.outputTransitions();
+		
+		DKA dka = new DKA(eNKA);
+		dka.outputClusters();
+		dka.outputTransitions();
+		
 	}
 
 }
