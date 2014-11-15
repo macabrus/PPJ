@@ -1,6 +1,8 @@
 
 
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
 
 /**
  * Class modelling a single grammar production.
@@ -29,5 +31,11 @@ public class Production {
 			}
 		}
 	}
-
+	
+	public void fromProduction(Production p) {
+		this.left = new String(p.left);
+		for (String str : p.right) this.right.add(new String(str));
+		this.productionNumber = p.productionNumber;
+	}
+	
 }
