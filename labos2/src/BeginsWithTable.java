@@ -26,6 +26,49 @@ public class BeginsWithTable {
 		createTable();
 	}
 
+	/**
+	 * Method that finds all nonterminals that have an epsilon production, i.e.
+	 * <A> -> $
+	 */
+	public void getEmptyNonterminals() {
+		// add left sides of all epsilon productions
+		for (String nonterm : nonterminals) {
+			for (Production production : grammar.get(nonterm)) {
+
+				if (production.right.size() == 0) {
+					emptyNonterminals.add(production.left);
+				}
+			}
+		}
+
+		// if all characters from right side of production can result in
+		// epsilon, add the left side
+		boolean changed = true;
+
+		while (changed) {
+			changed = false;
+
+			for (String nonterminal : nonterminals) {
+				for (Production production : grammar.get(nonterminal)) {
+					boolean empty = true;
+
+					// check whether all right side characters are empty
+					for (String rightChar : production.right) {
+						if (!emptyNonterminals.contains(rightChar)) {
+							empty = false;
+							break;
+						}
+					}
+
+					if (!emptyNonterminals.contains(production.left) && empty) {
+						changed = true;
+						emptyNonterminals.add(production.left);
+					}
+				}
+			}
+		}
+	}
+
 	private void createTable() {
 		for (String c : allChars) {
 			beginsWith.put(c, new HashMap<String, Integer>());
@@ -102,49 +145,6 @@ public class BeginsWithTable {
 		}
 
 		return beginners;
-	}
-
-	/**
-	 * Method that finds all nonterminals that have an epsilon production, i.e.
-	 * <A> -> $
-	 */
-	public void getEmptyNonterminals() {
-		// add left sides of all epsilon productions
-		for (String nonterm : nonterminals) {
-			for (Production production : grammar.get(nonterm)) {
-
-				if (production.right.size() == 0) {
-					emptyNonterminals.add(production.left);
-				}
-			}
-		}
-
-		// if all characters from right side of production can result in
-		// epsilon, add the left side
-		boolean changed = true;
-
-		while (changed) {
-			changed = false;
-
-			for (String nonterminal : nonterminals) {
-				for (Production production : grammar.get(nonterminal)) {
-					boolean empty = true;
-
-					// check whether all right side characters are empty
-					for (String rightChar : production.right) {
-						if (!emptyNonterminals.contains(rightChar)) {
-							empty = false;
-							break;
-						}
-					}
-
-					if (!emptyNonterminals.contains(production.left) && empty) {
-						changed = true;
-						emptyNonterminals.add(production.left);
-					}
-				}
-			}
-		}
 	}
 
 	public boolean generatesEpsilon(String nonterminal) {
