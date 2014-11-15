@@ -6,6 +6,7 @@ import java.io.InputStreamReader;
 import java.io.ObjectOutputStream;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 
 /**
  * Class modelling a syntax generator.
@@ -19,7 +20,7 @@ public class GSA {
 	private static ArrayList<String> allChars = new ArrayList<>();
 	private static ArrayList<String> nonterminals = new ArrayList<>();
 	private static ArrayList<String> terminals = new ArrayList<>();
-	private static ArrayList<String> synchro = new ArrayList<>();
+	private static HashSet<String> synchro = new HashSet<>();
 	private static GenerateLRParserTable LRParserTable;
 
 	// map of all productions, key is leftSide, value is array of all
