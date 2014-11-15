@@ -1,10 +1,11 @@
-
 import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
 
 /**
- * Class modelling a single grammar production.
+ * Class modelling a single grammar production. A grammar production consists of
+ * a left side (nonterminal) and right side (array of both terminal and
+ * nonterminal characters). We also have to keep track of the index of the
+ * production, determined by the input file, in order to solve Reduce/Reduce
+ * ambiguities.
  * 
  * @author Paula Gombar, 0036474619
  * 
@@ -71,5 +72,10 @@ public class Production {
 			return false;
 		return true;
 	}
-	
+
+	@Override
+	public String toString() {
+		return left + "->" + right.toString();
+	}
+
 }

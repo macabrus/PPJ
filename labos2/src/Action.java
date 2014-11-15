@@ -24,4 +24,16 @@ public class Action {
 	public Action() {
 	}
 
+	@Override
+	public String toString() {
+		if (accept)
+			return "A";
+		if (shift > -1)
+			return "S" + shift;
+		if (reduce != null)
+			return "R" + reduce.toString();
+
+		return "";
+	}
+
 }

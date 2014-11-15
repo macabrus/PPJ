@@ -4,8 +4,13 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.HashSet;
 
+/**
+ * Class modelling a syntax generator.
+ * 
+ * @author Paula Gombar, 0036474619
+ * 
+ */
 public class GSA {
 
 	// list of all chars, terminals and nonterminals
@@ -102,17 +107,11 @@ public class GSA {
 		// getEmptyNonterminals();
 		// getBeginsWith();
 		BeginsWithTable beginsWith = new BeginsWithTable(allChars, nonterminals, grammar);
-		
 		EpsilonNKA eNKA = new EpsilonNKA(nonterminals.get(0), grammar, beginsWith, nonterminals, terminals);
 		eNKA.generateEpsilonNKA();
-		eNKA.outputStates();
-		System.out.println("----");
-		eNKA.outputTransitions();
-		
-		DKA dka = new DKA(eNKA);
-		dka.outputClusters();
-		dka.outputTransitions();
-		
+		GenerateLRParserTable actionTable = new GenerateLRParserTable(eNKA, terminals, nonterminals);
+
+		System.out.println(actionTable.toString());
 	}
 
 }

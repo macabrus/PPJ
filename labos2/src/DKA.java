@@ -2,7 +2,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 
-
 /**
  * DKA constructed from e-NKA
  * 
@@ -11,12 +10,12 @@ import java.util.HashSet;
 public class DKA {
 
 	public class DKATransition {
-		
+
 		public Integer from;
 		public Integer to;
-		
+
 		public String edge;
-		
+
 		public DKATransition(Integer from, Integer to, String edge) {
 			this.from = from;
 			this.to = to;
@@ -66,20 +65,18 @@ public class DKA {
 		private DKA getOuterType() {
 			return DKA.this;
 		}
-		
-		
-		
+
 	}
-	
-	private int clusters; 
-	
-	private EpsilonNKA eNKA; 
-	
+
+	public int clusters;
+
+	private EpsilonNKA eNKA;
+
 	private HashMap<Integer, HashSet<EpsilonNKA.State>> cluster;
 	private HashSet<DKATransition> transitions;
-	
+
 	private HashMap<EpsilonNKA.State, ArrayList<Integer>> clusterID;
-	
+
 	public DKA(EpsilonNKA eNKA) {
 		this.eNKA = eNKA;
 		clusters = 0;
@@ -88,48 +85,53 @@ public class DKA {
 		clusterID = new HashMap<EpsilonNKA.State, ArrayList<Integer>>();
 		constructDKA();
 	}
+
 	private void makeClusters() {
-		
+
 		boolean change = false;
-		
+
 		do {
-			
+
 			change = false;
-			
-			for (EpsilonNKA.Transition t: eNKA.getTransitions()) {
-				
-				if (!t.edge.equals("$")) continue;
-				
+
+			for (EpsilonNKA.Transition t : eNKA.getTransitions()) {
+
+				if (!t.edge.equals("$"))
+					continue;
+
 				ArrayList<Integer> fromClustId = clusterID.get(t.from);
 				ArrayList<Integer> toClustId = clusterID.get(t.to);
-				
+
 				if (fromClustId == null) {
 					fromClustId = new ArrayList<Integer>();
 					fromClustId.add(clusters++);
 					change = true;
 				}
-				
-				if (toClustId == null) toClustId = new ArrayList<Integer>();
-								
-				for (Integer i : fromClustId){
-					if (!toClustId.contains(i)) change = true;
+
+				if (toClustId == null)
+					toClustId = new ArrayList<Integer>();
+
+				for (Integer i : fromClustId) {
+					if (!toClustId.contains(i))
+						change = true;
 					toClustId.add(new Integer(i));
 				}
-			
+
 				ArrayList<Integer> _fromClustId = new ArrayList<Integer>();
 				ArrayList<Integer> _toClustId = new ArrayList<Integer>();
-				
-				for (Integer i : fromClustId) _fromClustId.add(i);
-				for (Integer i : toClustId) _toClustId.add(i);
-				
-				
+
+				for (Integer i : fromClustId)
+					_fromClustId.add(i);
+				for (Integer i : toClustId)
+					_toClustId.add(i);
+
 				clusterID.put(t.from, _fromClustId);
 				clusterID.put(t.to, _toClustId);
-				
+
 			}
-			
+
 			for (EpsilonNKA.State s : eNKA.getStates()) {
-				
+
 				ArrayList<Integer> C = clusterID.get(s);
 				if (C == null) {
 					change = true;
@@ -137,55 +139,65 @@ public class DKA {
 					C.add(clusters++);
 					clusterID.put(s, C);
 				}
-				
+
 				for (Integer i : C) {
 					HashSet<EpsilonNKA.State> hs = cluster.get(i);
-					if (hs == null) hs = new HashSet<EpsilonNKA.State>();
+					if (hs == null)
+						hs = new HashSet<EpsilonNKA.State>();
 					hs.add(s);
 					cluster.put(i, hs);
 				}
 			}
 		} while (change);
-		
+
 	}
-	
+
 	private void makeTransitions() {
 		for (EpsilonNKA.Transition t : eNKA.getTransitions()) {
-			
+
 			ArrayList<Integer> ClustID1 = clusterID.get(t.from);
 			ArrayList<Integer> ClustID2 = clusterID.get(t.to);
-			
-			if (t.edge.equals("$")) continue;
-			
+
+			if (t.edge.equals("$"))
+				continue;
+
 			for (Integer i : ClustID1) {
 				for (Integer j : ClustID2) {
-					//if (i.equals(j)) continue;
+					// if (i.equals(j)) continue;
 					DKATransition trans = new DKATransition(i, j, t.edge);
 					transitions.add(trans);
 				}
 			}
-			
-		}	
+
+		}
 	}
-	
+
 	private void constructDKA() {
 		makeClusters();
 		makeTransitions();
 	}
-	
+
 	public void outputClusters() {
 		for (int i = 0; i < clusters; ++i) {
 			HashSet<EpsilonNKA.State> set = cluster.get(i);
-			for (EpsilonNKA.State s : set) System.err.println(s);
+			for (EpsilonNKA.State s : set)
+				System.err.println(s);
 			System.err.println("---------------------------------------");
 		}
 	}
-	
+
 	public void outputTransitions() {
 		for (DKATransition t : transitions) {
 			System.err.println(t.from + "->" + t.to + " preko " + t.edge);
 		}
 	}
-	
+
+	public HashMap<Integer, HashSet<EpsilonNKA.State>> getCluster() {
+		return cluster;
+	}
+
+	public HashSet<DKATransition> getTransitions() {
+		return transitions;
+	}
+
 }
- 
