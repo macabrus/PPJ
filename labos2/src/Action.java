@@ -1,3 +1,5 @@
+import java.io.Serializable;
+
 /**
  * Class modelling an action of LR parser. Possible actions are shift(N),
  * reduce(Production) and accept().
@@ -5,8 +7,9 @@
  * @author Paula Gombar, 0036474619
  * 
  */
-public class Action {
+public class Action implements Serializable {
 
+	private static final long serialVersionUID = -910710423669351320L;
 	/**
 	 * Index of state which we're shifting to. If -1, then the action is not
 	 * shift.

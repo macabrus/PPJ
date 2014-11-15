@@ -1,8 +1,10 @@
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashMap;
 
-public class GenerateLRParserTable {
+public class GenerateLRParserTable implements Serializable {
 
+	private static final long serialVersionUID = 9012062540849752089L;
 	private DKA dka;
 	private ArrayList<String> terminals = new ArrayList<>();
 	private ArrayList<String> nonterminals = new ArrayList<>();

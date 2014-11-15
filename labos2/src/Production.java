@@ -1,3 +1,4 @@
+import java.io.Serializable;
 import java.util.ArrayList;
 
 /**
@@ -10,8 +11,9 @@ import java.util.ArrayList;
  * @author Paula Gombar, 0036474619
  * 
  */
-public class Production {
+public class Production implements Serializable {
 
+	private static final long serialVersionUID = -8446612721162372258L;
 	public String left;
 	public ArrayList<String> right = new ArrayList<>();
 	public int productionNumber;

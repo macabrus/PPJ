@@ -1,7 +1,9 @@
 import java.io.BufferedReader;
 import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.io.ObjectOutputStream;
 import java.util.ArrayList;
 import java.util.HashMap;
 
@@ -18,6 +20,7 @@ public class GSA {
 	private static ArrayList<String> nonterminals = new ArrayList<>();
 	private static ArrayList<String> terminals = new ArrayList<>();
 	private static ArrayList<String> synchro = new ArrayList<>();
+	private static GenerateLRParserTable LRParserTable;
 
 	// map of all productions, key is leftSide, value is array of all
 	// productions of that value
@@ -101,6 +104,27 @@ public class GSA {
 		allChars.addAll(temp);
 	}
 
+	private static void outputCollections() throws IOException {
+
+		FileOutputStream fout = new FileOutputStream("src/analizator/synchro.ser");
+		ObjectOutputStream oos = new ObjectOutputStream(fout);
+		oos.writeObject(synchro);
+
+		fout.close();
+		fout = new FileOutputStream("src/analizator/actions.ser");
+		oos = new ObjectOutputStream(fout);
+		oos.writeObject(LRParserTable.getActions());
+
+		fout.close();
+		fout = new FileOutputStream("src/analizator/newState.ser");
+		oos = new ObjectOutputStream(fout);
+		oos.writeObject(LRParserTable.getNewState());
+
+		fout.close();
+		oos.close();
+
+	}
+
 	public static void main(String[] args) throws IOException {
 		parseInput();
 		addNewInit();
@@ -109,9 +133,11 @@ public class GSA {
 		BeginsWithTable beginsWith = new BeginsWithTable(allChars, nonterminals, grammar);
 		EpsilonNKA eNKA = new EpsilonNKA(nonterminals.get(0), grammar, beginsWith, nonterminals, terminals);
 		eNKA.generateEpsilonNKA();
-		GenerateLRParserTable actionTable = new GenerateLRParserTable(eNKA, terminals, nonterminals);
+		LRParserTable = new GenerateLRParserTable(eNKA, terminals, nonterminals);
 
-		System.out.println(actionTable.toString());
+		outputCollections();
+		// System.out.println(actionTable.toString());
+
 	}
 
 }
