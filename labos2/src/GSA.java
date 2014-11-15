@@ -5,6 +5,7 @@ import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedList;
 import java.util.Queue;
 
 public class GSA {
@@ -92,6 +93,13 @@ public class GSA {
 		grammar.put(newInit, new ArrayList<Production>());
 		Production production = new Production(newInit, init, 0);
 		grammar.get(newInit).add(production);
+
+		// add the char to allChars
+		temp = new ArrayList<>();
+		temp.add(newInit);
+		temp.addAll(allChars);
+		allChars = new ArrayList<>();
+		allChars.addAll(temp);
 	}
 
 	/**
@@ -169,7 +177,39 @@ public class GSA {
 		// beginsWith is a transitive environment of beginsDirectlyWith
 
 		for (String c : beginsWith.keySet()) {
-//			Queue<String> q = new Queue<String>();
+			// mark itself, reflexive operation
+			beginsWith.get(c).put(c, 1);
+
+			// create queue and visited
+			Queue<String> queue = new LinkedList<String>();
+			HashSet<String> visited = new HashSet<>();
+
+			// init - add all marked values from the table into queue
+			for (String otherC : beginsWith.get(c).keySet()) {
+				if (beginsWith.get(c).get(otherC) == 1) {
+					queue.add(otherC);
+				}
+			}
+
+			// BFS over table
+			while (queue.size() > 0) {
+				String otherC = queue.peek();
+				queue.remove();
+
+				if (visited.contains(otherC))
+					continue;
+
+				// visit and mark in table
+				visited.add(otherC);
+				beginsWith.get(c).put(otherC, 1);
+
+				// add to queue all reachable
+				for (String nextC : beginsWith.get(otherC).keySet()) {
+					if (beginsWith.get(otherC).get(nextC) == 1)
+						queue.add(nextC);
+				}
+			}
+
 		}
 
 	}
@@ -179,6 +219,14 @@ public class GSA {
 		addNewInit();
 		getEmptyNonterminals();
 		getBeginsWith();
+
+		for (String c : beginsWith.keySet()) {
+			System.out.println("char " + c + " begins with:");
+			for (String cc : beginsWith.get(c).keySet()) {
+				if (beginsWith.get(c).get(cc) == 1)
+					System.out.println("\t" + cc);
+			}
+		}
 	}
 
 }
