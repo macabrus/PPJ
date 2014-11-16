@@ -38,5 +38,21 @@ public class Action implements Serializable {
 
 		return "";
 	}
-
+	
+	public boolean isNothing() {
+		return shift == -1 && reduce == null && accept == false;
+	}
+	
+	public boolean isAccept() {
+		return accept;
+	}
+	
+	public boolean isShift() {
+		return shift != -1;
+	}
+	
+	public boolean isReduce() {
+		return reduce != null;
+	}
+	
 }

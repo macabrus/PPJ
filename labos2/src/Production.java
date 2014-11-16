@@ -2,7 +2,7 @@ import java.io.Serializable;
 import java.util.ArrayList;
 
 /**
- * Class modelling a single grammar production. A grammar production consists of
+ * Class modeling a single grammar production. A grammar production consists of
  * a left side (nonterminal) and right side (array of both terminal and
  * nonterminal characters). We also have to keep track of the index of the
  * production, determined by the input file, in order to solve Reduce/Reduce
