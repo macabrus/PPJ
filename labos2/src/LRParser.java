@@ -48,10 +48,8 @@ public class LRParser {
 	private void parse() {
 
 		states.push(0);
-		int br = 0;
+		
 		while (true) {
-
-			++br;
 
 			LexUnit lu;
 			Integer state = states.peek();

@@ -8,6 +8,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 
+
 /**
  * Class modelling a syntax generator.
  * 
@@ -135,6 +136,15 @@ public class GSA {
 		
 		EpsilonNKA eNKA = new EpsilonNKA(nonterminals.get(0), grammar, beginsWith, nonterminals, terminals);
 		eNKA.generateEpsilonNKA();
+		
+		eNKA.outputStates();
+		eNKA.outputTransitions();
+		eNKA.outputEpsTransitions();
+		
+		System.out.println("GOLI KURAC");
+		
+		
+		
 		DKA dka = new DKA(eNKA);
 
 		dka.outputClusters();

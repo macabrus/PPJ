@@ -43,7 +43,7 @@ public class GenerateLRParserTable implements Serializable {
 			if (!terminals.contains(transChar))
 				continue;
 
-			for (EpsilonNKA.State LRState : dka.getCluster().get(currentState)) {
+			for (EpsNKAState LRState : dka.getCluster().get(currentState)) {
 				// if the dot is not located at the end
 				if (LRState.dotIndex >= LRState.p.right.size())
 					continue;
@@ -58,7 +58,7 @@ public class GenerateLRParserTable implements Serializable {
 		// generate Reduce and Accept actions
 		// for each DKA state, check all LR States
 		for (Integer DKAState : dka.getCluster().keySet()) {
-			for (EpsilonNKA.State LRState : dka.getCluster().get(DKAState)) {
+			for (EpsNKAState LRState : dka.getCluster().get(DKAState)) {
 				// Reduce works only if the dot is the final element
 				if (LRState.dotIndex != LRState.p.right.size())
 					continue;

@@ -1,6 +1,9 @@
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
+import java.util.Queue;
 import java.util.Set;
 
 /**
@@ -9,63 +12,23 @@ import java.util.Set;
  * @author Ivan Paljak
  */
 public class EpsilonNKA {
+	
+	public EpsilonNKA() {}
+	
+	public class Transition {
 
-	public class State {
+		public EpsNKAState from, to;
+		public String edge;
 
-		public Production p;
-		public int dotIndex;
-		public Set<String> starts;
-
-		public State() {
-		}
-
-		public State(Production p, int dotIndex) {
-			this.p = p;
-			dotIndex = 0;
-		}
-
-		public boolean isAlive() {
-			return dotIndex < p.right.size();
-		}
-
-		public String afterDot() {
-			return p.right.get(dotIndex);
-		}
-
-		public void fromState(State s) {
-
-			this.p = new Production();
-			this.p.fromProduction(s.p);
-
-			this.dotIndex = s.dotIndex + 1;
-
-			this.starts = new HashSet<String>();
-			for (String str : s.starts)
-				this.starts.add(new String(str));
-
+		public Transition(EpsNKAState from, EpsNKAState to, String edge) {
+			this.from = from;
+			this.to = to;
+			this.edge = edge;
 		}
 
 		@Override
 		public String toString() {
-			StringBuilder sb = new StringBuilder(p.left);
-			sb.append("->");
-
-			for (int i = 0; i <= p.right.size(); i++) {
-				if (i == dotIndex)
-					sb.append("*");
-				if (i != p.right.size())
-					sb.append(p.right.get(i));
-			}
-			sb.append(", {");
-
-			for (String s : starts) {
-				if (s.equals(""))
-					sb.append("$,");
-				else
-					sb.append(s + ",");
-			}
-			sb.append("}");
-			return sb.toString();
+			return from.toString() + " --> ( " + edge + " ) " + to.toString();
 		}
 
 		@Override
@@ -73,9 +36,9 @@ public class EpsilonNKA {
 			final int prime = 31;
 			int result = 1;
 			result = prime * result + getOuterType().hashCode();
-			result = prime * result + dotIndex;
-			result = prime * result + ((p == null) ? 0 : p.hashCode());
-			result = prime * result + ((starts == null) ? 0 : starts.hashCode());
+			result = prime * result + ((edge == null) ? 0 : edge.hashCode());
+			result = prime * result + ((from == null) ? 0 : from.hashCode());
+			result = prime * result + ((to == null) ? 0 : to.hashCode());
 			return result;
 		}
 
@@ -87,20 +50,23 @@ public class EpsilonNKA {
 				return false;
 			if (getClass() != obj.getClass())
 				return false;
-			State other = (State) obj;
+			Transition other = (Transition) obj;
 			if (!getOuterType().equals(other.getOuterType()))
 				return false;
-			if (dotIndex != other.dotIndex)
-				return false;
-			if (p == null) {
-				if (other.p != null)
+			if (edge == null) {
+				if (other.edge != null)
 					return false;
-			} else if (!p.equals(other.p))
+			} else if (!edge.equals(other.edge))
 				return false;
-			if (starts == null) {
-				if (other.starts != null)
+			if (from == null) {
+				if (other.from != null)
 					return false;
-			} else if (!starts.equals(other.starts))
+			} else if (!from.equals(other.from))
+				return false;
+			if (to == null) {
+				if (other.to != null)
+					return false;
+			} else if (!to.equals(other.to))
 				return false;
 			return true;
 		}
@@ -108,24 +74,8 @@ public class EpsilonNKA {
 		private EpsilonNKA getOuterType() {
 			return EpsilonNKA.this;
 		}
-
-	}
-
-	public class Transition {
-
-		public State from, to;
-		public String edge;
-
-		public Transition(State from, State to, String edge) {
-			this.from = from;
-			this.to = to;
-			this.edge = edge;
-		}
-
-		@Override
-		public String toString() {
-			return from.toString() + " --> ( " + edge + " ) " + to.toString();
-		}
+		
+		
 
 	}
 
@@ -137,7 +87,7 @@ public class EpsilonNKA {
 	private ArrayList<String> nonterminal;
 	private ArrayList<String> terminal;
 
-	private ArrayList<State> states;
+	private ArrayList<EpsNKAState> states;
 	private ArrayList<Transition> transitions;
 
 	public EpsilonNKA(String startingState, HashMap<String, ArrayList<Production>> grammar, BeginsWithTable beginsWith,
@@ -149,13 +99,13 @@ public class EpsilonNKA {
 		this.nonterminal = nonterminal;
 		this.terminal = terminal;
 
-		states = new ArrayList<EpsilonNKA.State>();
+		states = new ArrayList<EpsNKAState>();
 		transitions = new ArrayList<EpsilonNKA.Transition>();
 
 		for (Production p : grammar.get(this.startingState)) {
-			State s = new State(p, 0);
+			EpsNKAState s = new EpsNKAState(p, 0);
 
-			Set<String> starts = new HashSet<String>();
+			HashSet<String> starts = new HashSet<String>();
 			starts.add("$");
 			s.starts = starts;
 
@@ -165,7 +115,7 @@ public class EpsilonNKA {
 	}
 
 	/** Getters for states and transitions **/
-	public ArrayList<State> getStates() {
+	public ArrayList<EpsNKAState> getStates() {
 		return states;
 	}
 
@@ -173,6 +123,53 @@ public class EpsilonNKA {
 		return transitions;
 	}
 
+	public ArrayList<String> getTerminals() {
+		return terminal;
+	}
+	
+	public ArrayList<String> getNonterminals() {
+		return nonterminal;
+	}
+	
+	public HashSet<EpsNKAState> makeTransition(HashSet<EpsNKAState> from, String e) {
+		HashSet<EpsNKAState> ret = new HashSet<EpsNKAState>();
+		for (Transition t : transitions) {
+			if (from.contains(t.from) && t.edge.equals(e)) ret.add(t.to);
+		}
+		return ret;
+	}
+	
+	public HashSet<EpsNKAState> getEpsDistance(HashSet<EpsNKAState> start) {
+		
+		HashSet<EpsNKAState> ret = new HashSet<EpsNKAState>();
+		for (EpsNKAState s : start) {
+			 EpsNKAState _s = new EpsNKAState();
+			_s.copyState(s);
+			ret.add(_s);
+		}
+		
+		boolean change = false;
+		
+		do {
+			
+			change = false;
+			
+			for (Transition t : transitions) {
+				if (!t.edge.equals("$")) continue;
+				if (ret.contains(t.from) && !ret.contains(t.to)) {
+					change = true;
+					EpsNKAState _s = new EpsNKAState();
+					_s.copyState(t.to);
+					ret.add(_s);
+				}
+			}
+			
+		} while (change); 
+		
+		return ret;
+		
+	}
+	
 	public void generateEpsilonNKA() {
 
 		int stateIndex = -1;
@@ -183,13 +180,13 @@ public class EpsilonNKA {
 			if (stateIndex == states.size())
 				break;
 
-			State currentState = states.get(stateIndex);
+			EpsNKAState currentState = states.get(stateIndex);
 			if (!currentState.isAlive()) {
 				continue;
 			}
 
 			// b) prijelaz
-			State nextState = new State();
+			EpsNKAState nextState = new EpsNKAState();
 
 			nextState.fromState(currentState);
 
@@ -204,7 +201,7 @@ public class EpsilonNKA {
 				continue;
 			}
 
-			Set<String> starting = new HashSet<String>();
+			HashSet<String> starting = new HashSet<String>();
 
 			boolean propagate = false;
 			if (currentState.dotIndex + 1 >= currentState.p.right.size())
@@ -227,7 +224,7 @@ public class EpsilonNKA {
 
 			for (Production p : grammar.get(currentState.afterDot())) {
 
-				nextState = new State(p, 0);
+				nextState = new EpsNKAState(p, 0);
 				nextState.starts = starting;
 
 				transitions.add(new Transition(currentState, nextState, "$"));
@@ -241,8 +238,18 @@ public class EpsilonNKA {
 
 	}
 
+	public void outputEpsTransitions() {
+		for (EpsNKAState s : states) {
+			System.out.println("Stanje: " + s.toString());
+			HashSet<EpsNKAState> _S = new HashSet<EpsNKAState>();
+			_S.add(s);
+			HashSet<EpsNKAState> S = this.getEpsDistance(_S);
+			for (EpsNKAState _s : S) System.out.println(_s);
+		}
+	}
+	
 	public void outputStates() {
-		for (State s : states)
+		for (EpsNKAState s : states)
 			System.out.println(s);
 	}
 
