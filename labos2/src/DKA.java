@@ -111,11 +111,11 @@ public class DKA {
 				if (toClustId == null)
 					toClustId = new ArrayList<Integer>();
 
-//				for (Integer i : fromClustId) {
-//					if (!toClustId.contains(i))
-//						change = true;
-//					toClustId.add(new Integer(i));
-//				}
+				// for (Integer i : fromClustId) {
+				// if (!toClustId.contains(i))
+				// change = true;
+				// toClustId.add(new Integer(i));
+				// }
 
 				for (int i = 0; i < fromClustId.size(); i++) {
 					int tmp = fromClustId.get(i);
@@ -197,6 +197,15 @@ public class DKA {
 	public void outputTransitions() {
 		for (DKATransition t : transitions) {
 			System.err.println(t.from + "->" + t.to + " preko " + t.edge);
+		}
+		for (DKATransition t1 : transitions) {
+			for (DKATransition t2 : transitions) {
+				if (t1.equals(t2))
+					continue;
+				if (t1.from.equals(t2.from) && !t1.to.equals(t2.to) && t1.edge.equals(t2.edge)) {
+					System.out.println("GOVNO");
+				}
+			}
 		}
 	}
 

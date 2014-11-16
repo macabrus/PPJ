@@ -48,10 +48,7 @@ public class LRParser {
 	private void parse() {
 
 		states.push(0);
-		int br = 0;
 		while (true) {
-
-			++br;
 
 			LexUnit lu;
 			Integer state = states.peek();
@@ -64,12 +61,12 @@ public class LRParser {
 			}
 
 			action = actions.get(state).get(lu.uniform);
-			System.out.println("state " + state + " char " + lu.toString() + " action " + action.toString());
 
 			if (action.isAccept())
 				break;
 
 			if (action.isNothing()) {
+				System.out.println("state " + state + " lu " + lu + " action " + action);
 				System.err.println("Oporavak od pogreske");
 				break;
 			}
