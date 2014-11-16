@@ -50,7 +50,7 @@ public class SA {
 	private static void inputSource() throws IOException {
 		// BufferedReader stdin = new BufferedReader(new
 		// InputStreamReader(System.in));
-		BufferedReader stdin = new BufferedReader(new InputStreamReader(new FileInputStream("test.in")));
+		BufferedReader stdin = new BufferedReader(new InputStreamReader(new FileInputStream("00aab_1.in")));
 		String line = "";
 		while (true) {
 			line = stdin.readLine();

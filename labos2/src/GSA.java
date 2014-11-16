@@ -128,12 +128,12 @@ public class GSA {
 	}
 
 	public static void main(String[] args) throws IOException {
-		String input = "test.san";
+		String input = "minusLang.san";
 		parseInput(input);
-		
+
 		addNewInit();
 		BeginsWithTable beginsWith = new BeginsWithTable(allChars, nonterminals, grammar);
-		
+
 		EpsilonNKA eNKA = new EpsilonNKA(nonterminals.get(0), grammar, beginsWith, nonterminals, terminals);
 		eNKA.generateEpsilonNKA();
 		
@@ -147,13 +147,20 @@ public class GSA {
 		
 		DKA dka = new DKA(eNKA);
 
-		dka.outputClusters();
+		System.out.println("eNKA broj stanja " + eNKA.getStates().size());
+		eNKA.outputStates();
 		System.out.println("---------------------------------------------------------------");
-		dka.outputTransitions();
+		// eNKA.outputTransitions();
 		System.out.println("---------------------------------------------------------------");
 
+		System.out.println("dka broj clustera " + dka.clusters);
+		// dka.outputClusters();
+		// System.out.println("---------------------------------------------------------------");
+		dka.outputTransitions();
+		// System.out.println("---------------------------------------------------------------");
+
 		LRParserTable = new GenerateLRParserTable(dka, terminals, nonterminals);
-		System.out.println(LRParserTable.toString());
+		// System.out.println(LRParserTable.toString());
 
 		outputCollections();
 	}

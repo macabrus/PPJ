@@ -179,6 +179,7 @@ public class DKA {
 	}
 	
 	private void makeClusters() {
+<<<<<<< HEAD
 		
 		int br = 0;
 		
@@ -210,6 +211,44 @@ public class DKA {
 				if (!Q.contains(nextState) && !clusterSet.contains(nextState)){
 					Q.add(nextState);
 					clusterSet.add(nextState);
+=======
+
+		boolean change = false;
+
+		do {
+
+			change = false;
+
+			for (EpsilonNKA.Transition t : eNKA.getTransitions()) {
+
+				if (!t.edge.equals("$"))
+					continue;
+
+				ArrayList<Integer> fromClustId = clusterID.get(t.from);
+				ArrayList<Integer> toClustId = clusterID.get(t.to);
+
+				if (fromClustId == null) {
+					fromClustId = new ArrayList<Integer>();
+					fromClustId.add(clusters++);
+					change = true;
+				}
+
+				if (toClustId == null)
+					toClustId = new ArrayList<Integer>();
+
+				// for (Integer i : fromClustId) {
+				// if (!toClustId.contains(i))
+				// change = true;
+				// toClustId.add(new Integer(i));
+				// }
+
+				for (int i = 0; i < fromClustId.size(); i++) {
+					int tmp = fromClustId.get(i);
+					if (!toClustId.contains(tmp)) {
+						change = true;
+						toClustId.add(new Integer(tmp));
+					}
+>>>>>>> 50d91076f7ae86f6ebf443e9946cf3e415112d5c
 				}
 			}
 			
@@ -263,6 +302,15 @@ public class DKA {
 	public void outputTransitions() {
 		for (DKATransition t : transitions) {
 			System.err.println(t.from + "->" + t.to + " preko " + t.edge);
+		}
+		for (DKATransition t1 : transitions) {
+			for (DKATransition t2 : transitions) {
+				if (t1.equals(t2))
+					continue;
+				if (t1.from.equals(t2.from) && !t1.to.equals(t2.to) && t1.edge.equals(t2.edge)) {
+					System.out.println("GOVNO");
+				}
+			}
 		}
 	}
 
