@@ -27,10 +27,10 @@ public class GSA {
 	// productions of that value
 	private static HashMap<String, ArrayList<Production>> grammar = new HashMap<>();
 
-	private static void parseInput() throws IOException {
+	private static void parseInput(String input) throws IOException {
 		// BufferedReader br = new BufferedReader(new
 		// InputStreamReader(System.in));
-		BufferedReader br = new BufferedReader(new InputStreamReader(new FileInputStream("test.san")));
+		BufferedReader br = new BufferedReader(new InputStreamReader(new FileInputStream(input)));
 		String currLine;
 
 		// input nonterminals
@@ -127,11 +127,12 @@ public class GSA {
 	}
 
 	public static void main(String[] args) throws IOException {
-		parseInput();
+		String input = "test.san";
+		parseInput(input);
+		
 		addNewInit();
-		// getEmptyNonterminals();
-		// getBeginsWith();
 		BeginsWithTable beginsWith = new BeginsWithTable(allChars, nonterminals, grammar);
+		
 		EpsilonNKA eNKA = new EpsilonNKA(nonterminals.get(0), grammar, beginsWith, nonterminals, terminals);
 		eNKA.generateEpsilonNKA();
 		DKA dka = new DKA(eNKA);
