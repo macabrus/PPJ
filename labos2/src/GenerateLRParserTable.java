@@ -75,16 +75,24 @@ public class GenerateLRParserTable implements Serializable {
 
 					if (action.shift != -1) {
 						// we have a Shift/Reduce collision, use Shift
-						System.err.println("Collision between shift and reduce, using shift");
+						System.err.printf("Collision between Shift(%d) and Reduce(%s) for [%d,%s], using Shift.",
+								action.shift, LRState.p, DKAState, transChar);
 						continue;
 					}
 
 					if (action.reduce != null) {
 						// we have a Reduce/Reduce collision, using the one
-						// stated before
+						// stated before in the input file
 						if (action.reduce.productionNumber > LRState.p.productionNumber) {
 							action.reduce = LRState.p;
+							System.err.printf(
+									"Collision between Reduce(%s) and Reduce(%s) for [%d,%s], using Reduce(%s).",
+									action.reduce, LRState.p, DKAState, transChar, LRState.p);
 						} else { // do nothing
+							// keep the reduction already stated
+							System.err.printf(
+									"Collision between Reduce(%s) and Reduce(%s) for [%d,%s], using Reduce(%s).",
+									action.reduce, LRState.p, DKAState, transChar, action.reduce);
 						}
 						continue;
 					}
