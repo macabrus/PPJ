@@ -68,6 +68,8 @@ public class SA {
 		inputActions();
 		inputNewState();
 		inputSource();
+		LRParser parser = new LRParser(lexUnits, actions, newState, synchro);
+		System.out.println(parser.getRoot().toString());
 	}
 
 }
