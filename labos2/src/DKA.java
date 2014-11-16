@@ -111,10 +111,18 @@ public class DKA {
 				if (toClustId == null)
 					toClustId = new ArrayList<Integer>();
 
-				for (Integer i : fromClustId) {
-					if (!toClustId.contains(i))
+//				for (Integer i : fromClustId) {
+//					if (!toClustId.contains(i))
+//						change = true;
+//					toClustId.add(new Integer(i));
+//				}
+
+				for (int i = 0; i < fromClustId.size(); i++) {
+					int tmp = fromClustId.get(i);
+					if (!toClustId.contains(tmp)) {
 						change = true;
-					toClustId.add(new Integer(i));
+						toClustId.add(new Integer(tmp));
+					}
 				}
 
 				ArrayList<Integer> _fromClustId = new ArrayList<Integer>();

@@ -11,8 +11,8 @@ public class GenerateLRParserTable implements Serializable {
 	public HashMap<Integer, HashMap<String, Action>> actions = new HashMap<>();
 	public HashMap<Integer, HashMap<String, Integer>> newState = new HashMap<>();
 
-	public GenerateLRParserTable(EpsilonNKA eNKA, ArrayList<String> terminals, ArrayList<String> nonterminals) {
-		this.dka = new DKA(eNKA);
+	public GenerateLRParserTable(DKA dka, ArrayList<String> terminals, ArrayList<String> nonterminals) {
+		this.dka = dka;
 		this.terminals = terminals;
 		this.nonterminals = nonterminals;
 		fillActions();
@@ -75,7 +75,7 @@ public class GenerateLRParserTable implements Serializable {
 
 					if (action.shift != -1) {
 						// we have a Shift/Reduce collision, use Shift
-						System.err.printf("Collision between Shift(%d) and Reduce(%s) for [%d,%s], using Shift.",
+						System.err.printf("Collision between Shift(%d) and Reduce(%s) for [%d,%s], using Shift.\n",
 								action.shift, LRState.p, DKAState, transChar);
 						continue;
 					}
@@ -86,12 +86,12 @@ public class GenerateLRParserTable implements Serializable {
 						if (action.reduce.productionNumber > LRState.p.productionNumber) {
 							action.reduce = LRState.p;
 							System.err.printf(
-									"Collision between Reduce(%s) and Reduce(%s) for [%d,%s], using Reduce(%s).",
+									"Collision between Reduce(%s) and Reduce(%s) for [%d,%s], using Reduce(%s).\n",
 									action.reduce, LRState.p, DKAState, transChar, LRState.p);
 						} else { // do nothing
 							// keep the reduction already stated
 							System.err.printf(
-									"Collision between Reduce(%s) and Reduce(%s) for [%d,%s], using Reduce(%s).",
+									"Collision between Reduce(%s) and Reduce(%s) for [%d,%s], using Reduce(%s).\n",
 									action.reduce, LRState.p, DKAState, transChar, action.reduce);
 						}
 						continue;

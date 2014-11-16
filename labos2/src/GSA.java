@@ -30,7 +30,7 @@ public class GSA {
 	private static void parseInput() throws IOException {
 		// BufferedReader br = new BufferedReader(new
 		// InputStreamReader(System.in));
-		BufferedReader br = new BufferedReader(new InputStreamReader(new FileInputStream("pi.san")));
+		BufferedReader br = new BufferedReader(new InputStreamReader(new FileInputStream("testSloz.san")));
 		String currLine;
 
 		// input nonterminals
@@ -134,11 +134,18 @@ public class GSA {
 		BeginsWithTable beginsWith = new BeginsWithTable(allChars, nonterminals, grammar);
 		EpsilonNKA eNKA = new EpsilonNKA(nonterminals.get(0), grammar, beginsWith, nonterminals, terminals);
 		eNKA.generateEpsilonNKA();
-		LRParserTable = new GenerateLRParserTable(eNKA, terminals, nonterminals);
-
+		// eNKA.outputStates();
+		// System.out.println("---------------------------------------------------------------");
+		// eNKA.outputTransitions();
+		// System.out.println("---------------------------------------------------------------");
+		DKA dka = new DKA(eNKA);
+		dka.outputClusters();
+		System.out.println("---------------------------------------------------------------");
+		dka.outputTransitions();
+		System.out.println("---------------------------------------------------------------");
+		LRParserTable = new GenerateLRParserTable(dka, terminals, nonterminals);
+		System.out.println(LRParserTable.toString());
 		outputCollections();
-		// System.out.println(actionTable.toString());
-
 	}
 
 }
