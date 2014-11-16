@@ -6,6 +6,7 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.ObjectInput;
 import java.io.ObjectInputStream;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 
@@ -14,11 +15,12 @@ public class SA {
 	private static HashSet<String> synchro = new HashSet<>();
 	private static HashMap<Integer, HashMap<String, Action>> actions = new HashMap<>();
 	private static HashMap<Integer, HashMap<String, Integer>> newState = new HashMap<>();
+	private static ArrayList<LexUnit> lexUnits = new ArrayList<>();
 
 	private static ObjectInput input;
 	private static InputStream buffer;
 	private static InputStream file;
-	
+
 	private static String source = "";
 
 	@SuppressWarnings("unchecked")
@@ -46,14 +48,16 @@ public class SA {
 	}
 
 	private static void inputSource() throws IOException {
-		BufferedReader stdin = new BufferedReader(new InputStreamReader(System.in));
-		// BufferedReader stdin = new BufferedReader(new InputStreamReader(new
-		// FileInputStream("test.in")));
+		// BufferedReader stdin = new BufferedReader(new
+		// InputStreamReader(System.in));
+		BufferedReader stdin = new BufferedReader(new InputStreamReader(new FileInputStream("test.in")));
 		String line = "";
 		while (true) {
 			line = stdin.readLine();
 			if (line == null)
 				break;
+			LexUnit unit = new LexUnit(line);
+			lexUnits.add(unit);
 			source += line + "\n";
 		}
 		stdin.close();
