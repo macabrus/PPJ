@@ -138,15 +138,15 @@ public class GSA {
 		DKA dka = new DKA(eNKA);
 
 		System.out.println("eNKA broj stanja " + eNKA.getStates().size());
-//		eNKA.outputStates();
+		eNKA.outputStates();
 		System.out.println("---------------------------------------------------------------");
-//		eNKA.outputTransitions();
+		// eNKA.outputTransitions();
 		System.out.println("---------------------------------------------------------------");
 
 		System.out.println("dka broj clustera " + dka.clusters);
 		// dka.outputClusters();
 		// System.out.println("---------------------------------------------------------------");
-		 dka.outputTransitions();
+		dka.outputTransitions();
 		// System.out.println("---------------------------------------------------------------");
 
 		LRParserTable = new GenerateLRParserTable(dka, terminals, nonterminals);
