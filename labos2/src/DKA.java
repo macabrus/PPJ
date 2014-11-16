@@ -179,92 +179,56 @@ public class DKA {
 	}
 
 	private void makeClusters() {
-		
+
 		int br = 0;
-		
-		while (!Q.isEmpty() && br < 10) { 
-			
+
+		while (!Q.isEmpty() && br < 10) {
+
 			++br;
-			
-		//	System.out.println(clusterSet.size());
-			
+
+			// System.out.println(clusterSet.size());
+
 			Cluster currentCluster = Q.peek();
-			//System.out.println("Govno s kjua: " + Q.size());
-			//System.out.println(currentCluster);
-			
+			// System.out.println("Govno s kjua: " + Q.size());
+			// System.out.println(currentCluster);
+
 			Q.remove();
-			
+
 			System.out.println("KURCINA ------------------------------------");
-			for (Cluster c : clusterSet) System.out.println(c);
-			
-			
+			for (Cluster c : clusterSet)
+				System.out.println(c);
+
 			currentCluster.mergeContents(eNKA.getEpsDistance(currentCluster.contents));
 			Cluster copyCluster = new Cluster();
 			copyCluster.fromCluster(currentCluster);
-			
+
 			clusterSet.add(copyCluster);
-			
+
 			for (String s : eNKA.getTerminals()) {
 				Cluster nextState = new Cluster(eNKA.makeTransition(currentCluster.contents, s));
-				if (nextState.contents.isEmpty()) continue;
-				if (!Q.contains(nextState) && !clusterSet.contains(nextState)){
+				if (nextState.contents.isEmpty())
+					continue;
+				if (!Q.contains(nextState) && !clusterSet.contains(nextState)) {
 					Q.add(nextState);
 					clusterSet.add(nextState);
-
-		boolean change = false;
-		String isuseBoze = "";
-
-		do {
-			change = false;
-
-			for (EpsilonNKA.Transition t : eNKA.getTransitions()) {
-
-				if (!t.edge.equals("$"))
-					continue;
-
-				ArrayList<Integer> fromClustId = clusterID.get(t.from);
-				ArrayList<Integer> toClustId = clusterID.get(t.to);
-
-				if (fromClustId == null) {
-					fromClustId = new ArrayList<Integer>();
-					fromClustId.add(clusters++);
-					change = true;
-				}
-
-				if (toClustId == null)
-					toClustId = new ArrayList<Integer>();
-
-				// for (Integer i : fromClustId) {
-				// if (!toClustId.contains(i))
-				// change = true;
-				// toClustId.add(new Integer(i));
-				// }
-
-				for (int i = 0; i < fromClustId.size(); i++) {
-					int tmp = fromClustId.get(i);
-					if (!toClustId.contains(tmp)) {
-						change = true;
-						toClustId.add(new Integer(tmp));
-					}
 				}
 			}
-			
+
 			for (String s : eNKA.getNonterminals()) {
 				Cluster nextState = new Cluster(eNKA.makeTransition(currentCluster.contents, s));
-				if (nextState.contents.isEmpty()) continue;
-				if (!Q.contains(nextState) && !clusterSet.contains(nextState)){
+				if (nextState.contents.isEmpty())
+					continue;
+				if (!Q.contains(nextState) && !clusterSet.contains(nextState)) {
 					Q.add(nextState);
 					clusterSet.add(nextState);
-					
 				}
 			}
-			
 		}
-		
+
 		for (Cluster c : clusterSet) {
 			cluster.put(clusters++, c.contents);
 		}
-		
+
 	}
 
 	private void makeTransitions() {

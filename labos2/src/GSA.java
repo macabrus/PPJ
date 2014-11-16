@@ -128,7 +128,7 @@ public class GSA {
 	}
 
 	public static void main(String[] args) throws IOException {
-		String input = "minusLang.san";
+		String input = "test.san";
 		parseInput(input);
 
 		addNewInit();

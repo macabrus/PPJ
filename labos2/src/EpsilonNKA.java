@@ -1,10 +1,6 @@
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Iterator;
-import java.util.Queue;
-import java.util.Set;
 
 /**
  * Class which models e-NKA.
@@ -12,9 +8,10 @@ import java.util.Set;
  * @author Ivan Paljak
  */
 public class EpsilonNKA {
-	
-	public EpsilonNKA() {}
-	
+
+	public EpsilonNKA() {
+	}
+
 	public class Transition {
 
 		public EpsNKAState from, to;
@@ -74,8 +71,6 @@ public class EpsilonNKA {
 		private EpsilonNKA getOuterType() {
 			return EpsilonNKA.this;
 		}
-		
-		
 
 	}
 
@@ -126,36 +121,38 @@ public class EpsilonNKA {
 	public ArrayList<String> getTerminals() {
 		return terminal;
 	}
-	
+
 	public ArrayList<String> getNonterminals() {
 		return nonterminal;
 	}
-	
+
 	public HashSet<EpsNKAState> makeTransition(HashSet<EpsNKAState> from, String e) {
 		HashSet<EpsNKAState> ret = new HashSet<EpsNKAState>();
 		for (Transition t : transitions) {
-			if (from.contains(t.from) && t.edge.equals(e)) ret.add(t.to);
+			if (from.contains(t.from) && t.edge.equals(e))
+				ret.add(t.to);
 		}
 		return ret;
 	}
-	
+
 	public HashSet<EpsNKAState> getEpsDistance(HashSet<EpsNKAState> start) {
-		
+
 		HashSet<EpsNKAState> ret = new HashSet<EpsNKAState>();
 		for (EpsNKAState s : start) {
-			 EpsNKAState _s = new EpsNKAState();
+			EpsNKAState _s = new EpsNKAState();
 			_s.copyState(s);
 			ret.add(_s);
 		}
-		
+
 		boolean change = false;
-		
+
 		do {
-			
+
 			change = false;
-			
+
 			for (Transition t : transitions) {
-				if (!t.edge.equals("$")) continue;
+				if (!t.edge.equals("$"))
+					continue;
 				if (ret.contains(t.from) && !ret.contains(t.to)) {
 					change = true;
 					EpsNKAState _s = new EpsNKAState();
@@ -163,13 +160,13 @@ public class EpsilonNKA {
 					ret.add(_s);
 				}
 			}
-			
-		} while (change); 
-		
+
+		} while (change);
+
 		return ret;
-		
+
 	}
-	
+
 	public void generateEpsilonNKA() {
 
 		int stateIndex = -1;
@@ -210,11 +207,14 @@ public class EpsilonNKA {
 			for (int i = currentState.dotIndex + 1; i < currentState.p.right.size(); ++i) {
 				String currString = currentState.p.right.get(i);
 				for (String str : beginsWith.getBeginsWith(currString)) {
-					if (nonterminal.contains(str)) continue;
+					if (nonterminal.contains(str))
+						continue;
 					starting.add(new String(str));
 				}
-				if (terminal.contains(currString)) continue;
-				if (beginsWith.generatesEpsilon(currString) || currString.equals("$")) propagate = true;
+				if (terminal.contains(currString))
+					continue;
+				if (beginsWith.generatesEpsilon(currString) || currString.equals("$"))
+					propagate = true;
 			}
 
 			if (propagate) {
@@ -244,10 +244,11 @@ public class EpsilonNKA {
 			HashSet<EpsNKAState> _S = new HashSet<EpsNKAState>();
 			_S.add(s);
 			HashSet<EpsNKAState> S = this.getEpsDistance(_S);
-			for (EpsNKAState _s : S) System.out.println(_s);
+			for (EpsNKAState _s : S)
+				System.out.println(_s);
 		}
 	}
-	
+
 	public void outputStates() {
 		for (EpsNKAState s : states)
 			System.out.println(s);
