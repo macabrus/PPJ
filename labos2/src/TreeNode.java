@@ -27,14 +27,15 @@ public class TreeNode {
 		children.add(node);
 	}
 
-	@Override
-	public String toString() {
-		String ret = "";
-		ret += this.nodeContent + "\n";
-		for (int i = children.size() - 1; i >= 0; i--)
-			ret += " " + children.get(i).toString();
-		// ret += "\n";
-		return ret;
+	public void printIndent(int indent) {
+		for (int i = 0; i < indent; ++i) System.out.print(" ");
 	}
+	
+	public void printSubtree(int indent) {
+		printIndent(indent);
+		System.out.println(this.nodeContent);
+		for (int i = children.size() - 1; i >= 0; i--)
+			children.get(i).printSubtree(indent + 1);
+}
 
 }
