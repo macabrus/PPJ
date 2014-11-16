@@ -86,7 +86,9 @@ public class DKA {
 		}
 
 		public Cluster(EpsNKAState state) {
-			this.contents.add(state);
+			EpsNKAState novoS = new EpsNKAState();
+			novoS.fromState(state);
+			this.contents.add(novoS);
 		}
 
 		public void fromCluster(Cluster x) {
@@ -105,7 +107,8 @@ public class DKA {
 			for (EpsNKAState s : c) {
 				EpsNKAState _s = new EpsNKAState();
 				_s.copyState(s);
-				this.contents.add(_s);
+				if (!this.contents.contains(_s))
+					this.contents.add(_s);
 			}
 		}
 
@@ -172,7 +175,10 @@ public class DKA {
 		HashSet<EpsNKAState> S42 = new HashSet<EpsNKAState>();
 		S42.add(eNKA.getStates().get(0));
 
+		cluster.put(0, eNKA.getEpsDistance(S42));
 		Q.add(new Cluster(eNKA.getEpsDistance(S42)));
+		
+		++clusters;
 
 		constructDKA();
 
@@ -181,8 +187,8 @@ public class DKA {
 	private void makeClusters() {
 
 		int br = 0;
-
-		while (!Q.isEmpty() && br < 10) {
+		
+		while (!Q.isEmpty()) {
 
 			++br;
 
@@ -198,24 +204,20 @@ public class DKA {
 			for (Cluster c : clusterSet)
 				System.out.println(c);
 
-			currentCluster.mergeContents(eNKA.getEpsDistance(currentCluster.contents));
-			Cluster copyCluster = new Cluster();
-			copyCluster.fromCluster(currentCluster);
-
-			clusterSet.add(copyCluster);
-
 			for (String s : eNKA.getTerminals()) {
 				Cluster nextState = new Cluster(eNKA.makeTransition(currentCluster.contents, s));
+				nextState.mergeContents(eNKA.getEpsDistance(nextState.contents));
 				if (nextState.contents.isEmpty())
 					continue;
 				if (!Q.contains(nextState) && !clusterSet.contains(nextState)) {
 					Q.add(nextState);
 					clusterSet.add(nextState);
-				}
+				} 
 			}
 
 			for (String s : eNKA.getNonterminals()) {
 				Cluster nextState = new Cluster(eNKA.makeTransition(currentCluster.contents, s));
+				nextState.mergeContents(eNKA.getEpsDistance(nextState.contents));
 				if (nextState.contents.isEmpty())
 					continue;
 				if (!Q.contains(nextState) && !clusterSet.contains(nextState)) {
@@ -232,12 +234,12 @@ public class DKA {
 	}
 
 	private void makeTransitions() {
-		for (int i = 0; i <= clusters; ++i) {
+		for (int i = 0; i < clusters; ++i) {
 			HashSet<EpsNKAState> c1 = cluster.get(i);
-			for (int j = 0; j <= clusters; ++j) {
+			for (int j = 0; j < clusters; ++j) {
 				HashSet<EpsNKAState> c2 = cluster.get(j);
 				for (EpsilonNKA.Transition t : eNKA.getTransitions()) {
-					if (c1.contains(t.from) && c2.contains(t.to)) {
+					if (c1.contains(t.from) && c2.contains(t.to) && !t.edge.equals("$")) {
 						DKATransition trans = new DKATransition(i, j, t.edge);
 						transitions.add(trans);
 					}

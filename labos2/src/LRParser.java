@@ -65,6 +65,7 @@ public class LRParser {
 				break;
 
 			if (action.isNothing()) {
+				System.err.println("Stanje: " + state + " char " + lu.uniform);
 				System.err.printf("Error recovery in row %s\n", lu.row);
 
 				// characters that wouldn't cause an error

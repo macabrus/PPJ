@@ -110,8 +110,8 @@ public class GenerateLRParserTable implements Serializable {
 			newState.put(i, new HashMap<String, Integer>());
 			for (String nonterminal : nonterminals) {
 				// ignore artificial starting nonterminal
-				if (nonterminal.equals(nonterminals.get(0)))
-					continue;
+			//	if (nonterminal.equals(nonterminals.get(0)))
+				//	continue;
 				newState.get(i).put(nonterminal, -1);
 			}
 		}
@@ -126,8 +126,8 @@ public class GenerateLRParserTable implements Serializable {
 				continue;
 
 			// ignore artificial starting nonterminal
-			if (transChar.equals(nonterminals.get(0)))
-				continue;
+		//	if (transChar.equals(nonterminals.get(0)))
+		//		continue;
 
 			newState.get(currState).put(transChar, toState);
 		}
@@ -152,8 +152,8 @@ public class GenerateLRParserTable implements Serializable {
 			HashMap<String, Integer> tmp = newState.get(i);
 			for (String nonterminal : nonterminals) {
 				// ignore artificial starting nonterminal
-				if (nonterminal.equals(nonterminals.get(0)))
-					continue;
+			//	if (nonterminal.equals(nonterminals.get(0)))
+			//		continue;
 				sb.append("State " + i + ", " + nonterminal + " -> " + tmp.get(nonterminal).toString());
 				sb.append("\n");
 			}
