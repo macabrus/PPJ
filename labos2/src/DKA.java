@@ -10,7 +10,7 @@ import java.util.Queue;
  * @author Ivan Paljak
  */
 public class DKA {
-	
+
 	public class DKATransition {
 
 		public Integer from;
@@ -35,7 +35,6 @@ public class DKA {
 			return result;
 		}
 
-		
 		@Override
 		public boolean equals(Object obj) {
 			if (this == obj)
@@ -72,11 +71,12 @@ public class DKA {
 	}
 
 	public class Cluster {
-		
+
 		public HashSet<EpsNKAState> contents = new HashSet<EpsNKAState>();
-		
-		public Cluster() {}
-		
+
+		public Cluster() {
+		}
+
 		public Cluster(HashSet<EpsNKAState> contents) {
 			for (EpsNKAState s : contents) {
 				EpsNKAState newState = new EpsNKAState();
@@ -84,11 +84,11 @@ public class DKA {
 				this.contents.add(s);
 			}
 		}
-		
+
 		public Cluster(EpsNKAState state) {
 			this.contents.add(state);
 		}
-		
+
 		public void fromCluster(Cluster x) {
 			for (EpsNKAState s : x.contents) {
 				EpsNKAState newState = new EpsNKAState();
@@ -96,11 +96,11 @@ public class DKA {
 				this.contents.add(s);
 			}
 		}
-		
+
 		public void addState(EpsNKAState s) {
 			contents.add(s);
 		}
-		
+
 		public void mergeContents(HashSet<EpsNKAState> c) {
 			for (EpsNKAState s : c) {
 				EpsNKAState _s = new EpsNKAState();
@@ -114,8 +114,7 @@ public class DKA {
 			final int prime = 31;
 			int result = 1;
 			result = prime * result + getOuterType().hashCode();
-			result = prime * result
-					+ ((contents == null) ? 0 : contents.hashCode());
+			result = prime * result + ((contents == null) ? 0 : contents.hashCode());
 			return result;
 		}
 
@@ -141,16 +140,17 @@ public class DKA {
 		private DKA getOuterType() {
 			return DKA.this;
 		}
-		
+
 		@Override
 		public String toString() {
 			String ret = "";
-			for (EpsNKAState s : this.contents) ret += "bla" + s.toString() + "\n"; 
+			for (EpsNKAState s : this.contents)
+				ret += "bla" + s.toString() + "\n";
 			return ret;
 		}
-		
+
 	}
-	
+
 	public int clusters;
 
 	private EpsilonNKA eNKA;
@@ -161,25 +161,24 @@ public class DKA {
 	private HashMap<EpsNKAState, ArrayList<Integer>> clusterID = new HashMap<EpsNKAState, ArrayList<Integer>>();
 
 	private HashSet<Cluster> clusterSet = new HashSet<DKA.Cluster>();
-	
+
 	private Queue<Cluster> Q = new LinkedList<DKA.Cluster>();
-	
-	public DKA (EpsilonNKA eNKA) {
-		
+
+	public DKA(EpsilonNKA eNKA) {
+
 		this.eNKA = eNKA;
 		clusters = 0;
-		
+
 		HashSet<EpsNKAState> S42 = new HashSet<EpsNKAState>();
 		S42.add(eNKA.getStates().get(0));
-		
+
 		Q.add(new Cluster(eNKA.getEpsDistance(S42)));
-		
+
 		constructDKA();
-	
+
 	}
-	
+
 	private void makeClusters() {
-<<<<<<< HEAD
 		
 		int br = 0;
 		
@@ -211,12 +210,11 @@ public class DKA {
 				if (!Q.contains(nextState) && !clusterSet.contains(nextState)){
 					Q.add(nextState);
 					clusterSet.add(nextState);
-=======
 
 		boolean change = false;
+		String isuseBoze = "";
 
 		do {
-
 			change = false;
 
 			for (EpsilonNKA.Transition t : eNKA.getTransitions()) {
@@ -248,7 +246,6 @@ public class DKA {
 						change = true;
 						toClustId.add(new Integer(tmp));
 					}
->>>>>>> 50d91076f7ae86f6ebf443e9946cf3e415112d5c
 				}
 			}
 			
