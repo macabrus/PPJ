@@ -11,6 +11,67 @@ import java.util.Queue;
  */
 public class DKA {
 
+	public class ClusterTransition {
+
+		public HashSet<EpsNKAState> from;
+		public HashSet<EpsNKAState> to;
+
+		public String edge;
+
+		public ClusterTransition(HashSet<EpsNKAState> from,
+				HashSet<EpsNKAState> to, String edge) {
+			super();
+			this.from = from;
+			this.to = to;
+			this.edge = edge;
+		}
+
+		@Override
+		public int hashCode() {
+			final int prime = 31;
+			int result = 1;
+			result = prime * result + getOuterType().hashCode();
+			result = prime * result + ((edge == null) ? 0 : edge.hashCode());
+			result = prime * result + ((from == null) ? 0 : from.hashCode());
+			result = prime * result + ((to == null) ? 0 : to.hashCode());
+			return result;
+		}
+
+		@Override
+		public boolean equals(Object obj) {
+			if (this == obj)
+				return true;
+			if (obj == null)
+				return false;
+			if (getClass() != obj.getClass())
+				return false;
+			ClusterTransition other = (ClusterTransition) obj;
+			if (!getOuterType().equals(other.getOuterType()))
+				return false;
+			if (edge == null) {
+				if (other.edge != null)
+					return false;
+			} else if (!edge.equals(other.edge))
+				return false;
+			if (from == null) {
+				if (other.from != null)
+					return false;
+			} else if (!from.equals(other.from))
+				return false;
+			if (to == null) {
+				if (other.to != null)
+					return false;
+			} else if (!to.equals(other.to))
+				return false;
+			return true;
+		}
+
+		private DKA getOuterType() {
+			return DKA.this;
+		}
+
+	}
+
 	public class DKATransition {
 
 		public Integer from;
@@ -117,7 +178,8 @@ public class DKA {
 			final int prime = 31;
 			int result = 1;
 			result = prime * result + getOuterType().hashCode();
-			result = prime * result + ((contents == null) ? 0 : contents.hashCode());
+			result = prime * result
+					+ ((contents == null) ? 0 : contents.hashCode());
 			return result;
 		}
 
@@ -159,9 +221,10 @@ public class DKA {
 	private EpsilonNKA eNKA;
 
 	private HashMap<Integer, HashSet<EpsNKAState>> cluster = new HashMap<Integer, HashSet<EpsNKAState>>();
-	private HashSet<DKATransition> transitions = new HashSet<DKA.DKATransition>();
+	private HashMap<HashSet<EpsNKAState>, Integer> clusterID = new HashMap<HashSet<EpsNKAState>, Integer>();
 
-	private HashMap<EpsNKAState, ArrayList<Integer>> clusterID = new HashMap<EpsNKAState, ArrayList<Integer>>();
+	private HashSet<DKATransition> transitions = new HashSet<DKA.DKATransition>();
+	private HashSet<ClusterTransition> clusterTransitions = new HashSet<DKA.ClusterTransition>();
 
 	private HashSet<Cluster> clusterSet = new HashSet<DKA.Cluster>();
 
@@ -176,6 +239,7 @@ public class DKA {
 		S42.add(eNKA.getStates().get(0));
 
 		cluster.put(0, eNKA.getEpsDistance(S42));
+		clusterID.put(eNKA.getEpsDistance(S42), 0);
 		Q.add(new Cluster(eNKA.getEpsDistance(S42)));
 
 		++clusters;
@@ -194,10 +258,14 @@ public class DKA {
 			Q.remove();
 
 			for (String s : eNKA.getTerminals()) {
-				Cluster nextState = new Cluster(eNKA.makeTransition(currentCluster.contents, s));
-				nextState.mergeContents(eNKA.getEpsDistance(nextState.contents));
+				Cluster nextState = new Cluster(eNKA.makeTransition(
+						currentCluster.contents, s));
+				nextState
+						.mergeContents(eNKA.getEpsDistance(nextState.contents));
 				if (nextState.contents.isEmpty())
 					continue;
+				clusterTransitions.add(new ClusterTransition(
+						currentCluster.contents, nextState.contents, s));
 				if (!Q.contains(nextState) && !clusterSet.contains(nextState)) {
 					Q.add(nextState);
 					clusterSet.add(nextState);
@@ -205,10 +273,14 @@ public class DKA {
 			}
 
 			for (String s : eNKA.getNonterminals()) {
-				Cluster nextState = new Cluster(eNKA.makeTransition(currentCluster.contents, s));
-				nextState.mergeContents(eNKA.getEpsDistance(nextState.contents));
+				Cluster nextState = new Cluster(eNKA.makeTransition(
+						currentCluster.contents, s));
+				nextState
+						.mergeContents(eNKA.getEpsDistance(nextState.contents));
 				if (nextState.contents.isEmpty())
 					continue;
+				clusterTransitions.add(new ClusterTransition(
+						currentCluster.contents, nextState.contents, s));
 				if (!Q.contains(nextState) && !clusterSet.contains(nextState)) {
 					Q.add(nextState);
 					clusterSet.add(nextState);
@@ -217,24 +289,45 @@ public class DKA {
 		}
 
 		for (Cluster c : clusterSet) {
+			clusterID.put(c.contents, clusters);
 			cluster.put(clusters++, c.contents);
 		}
 
 	}
 
 	private void makeTransitions() {
-		for (int i = 0; i < clusters; ++i) {
-			HashSet<EpsNKAState> c1 = cluster.get(i);
-			for (int j = 0; j < clusters; ++j) {
-				HashSet<EpsNKAState> c2 = cluster.get(j);
-				for (EpsilonNKA.Transition t : eNKA.getTransitions()) {
-					if (c1.contains(t.from) && c2.contains(t.to) && !t.edge.equals("$")) {
-						DKATransition trans = new DKATransition(i, j, t.edge);
-						transitions.add(trans);
-					}
-				}
-			}
+
+		for (ClusterTransition t : clusterTransitions) {
+			Integer fromId = clusterID.get(t.from);
+			Integer toId = clusterID.get(t.to);
+			transitions.add(new DKATransition(fromId, toId, t.edge));
 		}
+		System.out.println("Number of transitions: " + transitions.size());
+
+		for (DKATransition t : transitions)
+			System.out.println(t.from + " " + t.to + " " + t.edge);
+
+//		transitions = new HashSet<DKA.DKATransition>();
+
+//		for (int i = 0; i < clusters; ++i) {
+//			HashSet<EpsNKAState> c1 = cluster.get(i);
+//			for (int j = 0; j < clusters; ++j) {
+//				HashSet<EpsNKAState> c2 = cluster.get(j);
+//				for (EpsilonNKA.Transition t : eNKA.getTransitions()) {
+//					if (c1.contains(t.from) && c2.contains(t.to)
+//							&& !t.edge.equals("$")) {
+//						DKATransition trans = new DKATransition(i, j, t.edge);
+//						transitions.add(trans);
+//					}
+//				}
+//			}
+//		}
+//
+//		System.out.println("Number of transitions: " + transitions.size());
+//
+//		for (DKATransition t : transitions)
+//			System.out.println(t.from + " " + t.to + " " + t.edge);
+
 	}
 
 	private void constructDKA() {
@@ -259,7 +352,8 @@ public class DKA {
 			for (DKATransition t2 : transitions) {
 				if (t1.equals(t2))
 					continue;
-				if (t1.from.equals(t2.from) && !t1.to.equals(t2.to) && t1.edge.equals(t2.edge)) {
+				if (t1.from.equals(t2.from) && !t1.to.equals(t2.to)
+						&& t1.edge.equals(t2.edge)) {
 					System.out.println("bla");
 				}
 			}

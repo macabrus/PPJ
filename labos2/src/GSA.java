@@ -127,7 +127,7 @@ public class GSA {
 	}
 
 	public static void main(String[] args) throws IOException {
-		String input = "00aab_2.san";
+		String input = "test.san";
 		parseInput(input);
 
 		addNewInit();

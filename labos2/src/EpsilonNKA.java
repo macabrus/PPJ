@@ -174,6 +174,8 @@ public class EpsilonNKA {
 		while (stateIndex < states.size()) {
 			++stateIndex;
 
+			System.out.println(stateIndex);
+			
 			if (stateIndex == states.size())
 				break;
 
@@ -218,7 +220,7 @@ public class EpsilonNKA {
 			propagate = true;
 			for (int i = currentState.dotIndex + 1; i < currentState.p.right.size(); ++i) {
 				String currString = currentState.p.right.get(i);
-				if (beginsWith.generatesEpsilon(currString)) {
+				if (!beginsWith.generatesEpsilon(currString)) {
 					propagate = false;
 					break;
 				}
