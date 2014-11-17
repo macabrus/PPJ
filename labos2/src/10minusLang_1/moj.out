@@ -1,0 +1,7 @@
+<expr>
+ <atom>
+  UMINUS 2 -
+  <atom>
+   UMINUS 2 -
+   <atom>
+    OPERAND 2 3

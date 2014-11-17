@@ -186,23 +186,10 @@ public class DKA {
 
 	private void makeClusters() {
 
-		int br = 0;
-		
 		while (!Q.isEmpty()) {
 
-			++br;
-
-			// System.out.println(clusterSet.size());
-
 			Cluster currentCluster = Q.peek();
-			// System.out.println("Govno s kjua: " + Q.size());
-			// System.out.println(currentCluster);
-
 			Q.remove();
-
-			System.out.println("KURCINA ------------------------------------");
-			for (Cluster c : clusterSet)
-				System.out.println(c);
 
 			for (String s : eNKA.getTerminals()) {
 				Cluster nextState = new Cluster(eNKA.makeTransition(currentCluster.contents, s));
@@ -271,7 +258,7 @@ public class DKA {
 				if (t1.equals(t2))
 					continue;
 				if (t1.from.equals(t2.from) && !t1.to.equals(t2.to) && t1.edge.equals(t2.edge)) {
-					System.out.println("GOVNO");
+					System.out.println("bla");
 				}
 			}
 		}

@@ -25,7 +25,7 @@ public class SA {
 
 	@SuppressWarnings("unchecked")
 	private static void inputSynchro() throws IOException, ClassNotFoundException {
-		file = new FileInputStream("src/analizator/synchro.ser");
+		file = new FileInputStream("analizator/synchro.ser");
 		buffer = new BufferedInputStream(file);
 		input = new ObjectInputStream(buffer);
 		synchro = (HashSet<String>) input.readObject();
@@ -33,7 +33,7 @@ public class SA {
 
 	@SuppressWarnings("unchecked")
 	private static void inputActions() throws IOException, ClassNotFoundException {
-		file = new FileInputStream("src/analizator/actions.ser");
+		file = new FileInputStream("analizator/actions.ser");
 		buffer = new BufferedInputStream(file);
 		input = new ObjectInputStream(buffer);
 		actions = (HashMap<Integer, HashMap<String, Action>>) input.readObject();
@@ -41,16 +41,15 @@ public class SA {
 
 	@SuppressWarnings("unchecked")
 	private static void inputNewState() throws IOException, ClassNotFoundException {
-		file = new FileInputStream("src/analizator/newState.ser");
+		file = new FileInputStream("analizator/newState.ser");
 		buffer = new BufferedInputStream(file);
 		input = new ObjectInputStream(buffer);
 		newState = (HashMap<Integer, HashMap<String, Integer>>) input.readObject();
 	}
 
 	private static void inputSource() throws IOException {
-		// BufferedReader stdin = new BufferedReader(new
-		// InputStreamReader(System.in));
-		BufferedReader stdin = new BufferedReader(new InputStreamReader(new FileInputStream("test.in")));
+		BufferedReader stdin = new BufferedReader(new InputStreamReader(System.in));
+//		BufferedReader stdin = new BufferedReader(new InputStreamReader(new FileInputStream("00aab_2.in")));
 		String line = "";
 		while (true) {
 			line = stdin.readLine();

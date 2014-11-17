@@ -8,7 +8,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 
-
 /**
  * Class modelling a syntax generator.
  * 
@@ -29,9 +28,9 @@ public class GSA {
 	private static HashMap<String, ArrayList<Production>> grammar = new HashMap<>();
 
 	private static void parseInput(String input) throws IOException {
-		// BufferedReader br = new BufferedReader(new
-		// InputStreamReader(System.in));
-		BufferedReader br = new BufferedReader(new InputStreamReader(new FileInputStream(input)));
+		BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
+		// BufferedReader br = new BufferedReader(new InputStreamReader(new
+		// FileInputStream(input)));
 		String currLine;
 
 		// input nonterminals
@@ -108,17 +107,17 @@ public class GSA {
 
 	private static void outputCollections() throws IOException {
 
-		FileOutputStream fout = new FileOutputStream("src/analizator/synchro.ser");
+		FileOutputStream fout = new FileOutputStream("analizator/synchro.ser");
 		ObjectOutputStream oos = new ObjectOutputStream(fout);
 		oos.writeObject(synchro);
 
 		fout.close();
-		fout = new FileOutputStream("src/analizator/actions.ser");
+		fout = new FileOutputStream("analizator/actions.ser");
 		oos = new ObjectOutputStream(fout);
 		oos.writeObject(LRParserTable.getActions());
 
 		fout.close();
-		fout = new FileOutputStream("src/analizator/newState.ser");
+		fout = new FileOutputStream("analizator/newState.ser");
 		oos = new ObjectOutputStream(fout);
 		oos.writeObject(LRParserTable.getNewState());
 
@@ -128,7 +127,7 @@ public class GSA {
 	}
 
 	public static void main(String[] args) throws IOException {
-		String input = "test.san";
+		String input = "00aab_2.san";
 		parseInput(input);
 
 		addNewInit();
@@ -136,31 +135,15 @@ public class GSA {
 
 		EpsilonNKA eNKA = new EpsilonNKA(nonterminals.get(0), grammar, beginsWith, nonterminals, terminals);
 		eNKA.generateEpsilonNKA();
-		
-		eNKA.outputStates();
-		eNKA.outputTransitions();
-		eNKA.outputEpsTransitions();
-		
-		System.out.println("GOLI KURAC");
-		
-		
-		
+
+		// eNKA.outputStates();
+		// eNKA.outputTransitions();
+		// eNKA.outputEpsTransitions();
+
 		DKA dka = new DKA(eNKA);
 
-		System.out.println("eNKA broj stanja " + eNKA.getStates().size());
-		eNKA.outputStates();
-		System.out.println("---------------------------------------------------------------");
-		eNKA.outputTransitions();
-		System.out.println("---------------------------------------------------------------");
-
-		System.out.println("dka broj clustera " + dka.clusters);
-		 dka.outputClusters();
-		 System.out.println("---------------------------------------------------------------");
-	dka.outputTransitions();
-		 System.out.println("---------------------------------------------------------------");
-
 		LRParserTable = new GenerateLRParserTable(dka, terminals, nonterminals);
-		System.out.println(LRParserTable.toString());
+		// System.out.println(LRParserTable.toString());
 
 		outputCollections();
 	}

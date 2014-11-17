@@ -45,8 +45,9 @@ public class LRParser {
 	}
 
 	private void parse() {
-
 		states.push(0);
+		characters.push(new TreeNode("$"));
+
 		while (true) {
 
 			LexUnit lu;
@@ -65,7 +66,6 @@ public class LRParser {
 				break;
 
 			if (action.isNothing()) {
-				System.err.println("Stanje: " + state + " char " + lu.uniform);
 				System.err.printf("Error recovery in row %s\n", lu.row);
 
 				// characters that wouldn't cause an error
@@ -85,6 +85,7 @@ public class LRParser {
 					// stop at a syncro character
 					if (syncro.contains(input.get(i).uniform)) {
 						found = true;
+						break;
 					}
 					++pos;
 				}
@@ -99,8 +100,10 @@ public class LRParser {
 					// pop states until an action for syncro character is
 					// defined
 					Action tmp = actions.get(state).get(lu.uniform);
-					if (!tmp.isNothing())
+					if (!tmp.isNothing()) {
+						root = characters.peek();
 						break;
+					}
 
 					states.pop();
 					characters.pop();
@@ -140,10 +143,11 @@ public class LRParser {
 				Integer nextState = newState.get(state1).get(prod.left);
 
 				states.push(nextState);
+				root = newNode;
 			}
 
 		}
-		root = characters.peek();
+		// root = characters.peek();
 	}
 
 }
