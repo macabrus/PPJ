@@ -21,8 +21,6 @@ public class SA {
 	private static InputStream buffer;
 	private static InputStream file;
 
-	private static String source = "";
-
 	@SuppressWarnings("unchecked")
 	private static void inputSynchro() throws IOException, ClassNotFoundException {
 		file = new FileInputStream("analizator/synchro.ser");
@@ -57,7 +55,6 @@ public class SA {
 				break;
 			LexUnit unit = new LexUnit(line);
 			lexUnits.add(unit);
-			source += line + "\n";
 		}
 		stdin.close();
 	}

@@ -1,5 +1,4 @@
 import java.io.BufferedReader;
-import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -136,7 +135,7 @@ public class GSA {
 		EpsilonNKA eNKA = new EpsilonNKA(nonterminals.get(0), grammar, beginsWith, nonterminals, terminals);
 		eNKA.generateEpsilonNKA();
 		System.err.println("Done with eNKA.");
-		System.out.println("eNKA states: " + eNKA.getStates().size() + " trans: " + eNKA.getTransitions().size());
+		System.err.println("eNKA states: " + eNKA.getStates().size() + " trans: " + eNKA.getTransitions().size());
 
 		// eNKA.outputStates();
 		// eNKA.outputTransitions();
