@@ -211,12 +211,18 @@ public class EpsilonNKA {
 						continue;
 					starting.add(new String(str));
 				}
-				if (terminal.contains(currString))
-					continue;
-				if (beginsWith.generatesEpsilon(currString) || currString.equals("$"))
-					propagate = true;
+				if (!beginsWith.generatesEpsilon(currString))
+					break;
 			}
 
+			propagate = true;
+			for (int i = currentState.dotIndex + 1; i < currentState.p.right.size(); ++i) {
+				String currString = currentState.p.right.get(i);
+				if (beginsWith.generatesEpsilon(currString)) {
+					propagate = false;
+					break;
+				}
+			}
 			if (propagate) {
 				for (String str : currentState.starts)
 					starting.add(new String(str));

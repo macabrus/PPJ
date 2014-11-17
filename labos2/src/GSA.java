@@ -132,17 +132,21 @@ public class GSA {
 
 		addNewInit();
 		BeginsWithTable beginsWith = new BeginsWithTable(allChars, nonterminals, grammar);
-
+		System.err.println("Done with beginsWith table.");
 		EpsilonNKA eNKA = new EpsilonNKA(nonterminals.get(0), grammar, beginsWith, nonterminals, terminals);
 		eNKA.generateEpsilonNKA();
+		System.err.println("Done with eNKA.");
+		System.out.println("eNKA states: " + eNKA.getStates().size() + " trans: " + eNKA.getTransitions().size());
 
 		// eNKA.outputStates();
 		// eNKA.outputTransitions();
 		// eNKA.outputEpsTransitions();
 
 		DKA dka = new DKA(eNKA);
+		System.err.println("Done with DKA.");
 
 		LRParserTable = new GenerateLRParserTable(dka, terminals, nonterminals);
+		System.err.println("Done with parser table.");
 		// System.out.println(LRParserTable.toString());
 
 		outputCollections();

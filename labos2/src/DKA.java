@@ -177,7 +177,7 @@ public class DKA {
 
 		cluster.put(0, eNKA.getEpsDistance(S42));
 		Q.add(new Cluster(eNKA.getEpsDistance(S42)));
-		
+
 		++clusters;
 
 		constructDKA();
@@ -187,6 +187,8 @@ public class DKA {
 	private void makeClusters() {
 
 		while (!Q.isEmpty()) {
+
+			System.err.println(clusterSet.size());
 
 			Cluster currentCluster = Q.peek();
 			Q.remove();
@@ -199,7 +201,7 @@ public class DKA {
 				if (!Q.contains(nextState) && !clusterSet.contains(nextState)) {
 					Q.add(nextState);
 					clusterSet.add(nextState);
-				} 
+				}
 			}
 
 			for (String s : eNKA.getNonterminals()) {

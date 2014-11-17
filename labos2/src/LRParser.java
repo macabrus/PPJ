@@ -99,7 +99,7 @@ public class LRParser {
 				while (states.size() > 0) {
 					// pop states until an action for syncro character is
 					// defined
-					Action tmp = actions.get(state).get(lu.uniform);
+					Action tmp = actions.get(states.peek()).get(lu.uniform);
 					if (!tmp.isNothing()) {
 						root = characters.peek();
 						break;
