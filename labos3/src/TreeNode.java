@@ -7,11 +7,22 @@ import java.util.ArrayList;
  * @author Ivan Paljak
  */
 public class TreeNode {
-
+	
 	private int depth;
 	private String content;
-	
+
 	private ArrayList<TreeNode> children;
+
+	// -------------------------------------------
+	
+	private boolean lValue;
+	private boolean isConstant;
+	private boolean isDefined;
+	private boolean isConst;
+	private String type;
+	
+	private ArrayList<String> types = new ArrayList<String>(); 
+	private ArrayList<String> names = new ArrayList<String>();
 	
 	/**
 	 * Node constructor from its contents 
@@ -39,6 +50,16 @@ public class TreeNode {
 	}
 	
 	/**
+	 * Returns child at index
+	 * 
+	 * @param i index
+	 * @return :)
+	 */
+	public TreeNode getChildAt(int i){
+		return children.get(i);
+	}
+	
+	/**
 	 * Adds child to a list of children of specific node.
 	 * @param node Child to be added. 
 	 */
@@ -53,6 +74,87 @@ public class TreeNode {
 		for (int i = 0; i < indent; ++i) System.out.print(" ");
 		System.out.println(content);
 		for (TreeNode node : children) node.printSubtree(indent + 1);
+	}
+	
+	/**
+	 * Getter for content field
+	 * @return content
+	 */
+	public String getContent() {
+		return this.content;
+	}
+	
+	/**
+	 * :)
+	 * @return :)
+	 */
+	public boolean isConst() {
+		return isConstant;
+	}
+	
+	public boolean isFunction() {
+		return types.size() != 0;
+	}
+	
+	public boolean isFunctionDefined() {
+		if (!this.isFunction()) System.err.println("Greska koja se nebi smjela dogodit!");
+		return this.isDefined;
+	}
+	
+	public String getFunctionName() {
+		if (!this.isFunction()) System.err.println("Greska koja se nebi smjela dogodit!");
+		return this.getChildAt(2).getContent();
+ 	}
+	
+	public String getType() {
+		return type;
+	}
+	
+	public String getName() {
+		return name;
+	}
+	
+	public void setType(String type) {
+		this.type = type;
+	}
+	
+	public void setDefined(boolean x) {
+		isDefined = x;
+	}
+	
+	public ArrayList<String> getTypes() {
+		return this.types;
+	}
+	
+	public ArrayList<String> getNames() {
+		return this.names;
+	}
+	
+	public void setTypes(ArrayList<String> types) {
+		this.types = types;
+	}
+	
+	public void setNames(ArrayList<String> names) {
+		this.names = names;
+	}
+	
+	public void addType(String type) {
+		this.types.add(type);
+	} 
+
+	public void addName(String name) {
+		this.names.add(name);
+	} 
+	
+	public void setConst() {
+		this.isConst = true;
+	}
+	
+	@Override
+	public String toString() {
+		String ret = "";
+		for (TreeNode child : children) ret += child.getContent() + " ";
+		return ret;
 	}
 	
 }
