@@ -18,15 +18,15 @@ Izrazi
 <bin_ili_izraz>					0/2		+
 <log_i_izraz>					0/2		+
 <log_ili_izraz>					0/2		+
-<izraz_pridruzivanja>			0/2		+
-<izraz>							0/2		+
+<izraz_pridruzivanja>			2/2		+
+<izraz>							2/2		+
 -----------------------------------------
 Naredbena struktura programa
 -----------------------------------------
 <slozena_naredba>				2/2		+
 <lista_naredbi>					2/2		+
-<naredba>						0/1		+
-<izraz_naredba>					0/2
+<naredba>						1/1		+
+<izraz_naredba>					2/2
 <naredba_grananja>				0/2
 <naredba_petlje>				0/3
 <naredba_skoka>					0/3		+
@@ -37,11 +37,11 @@ Deklaracije i definicije
 -----------------------------------------
 <definicija_funkcije>			2/2		+
 <lista_parametara>				2/2
-<deklaracija_parametra>			0/2
+<deklaracija_parametra>			2/2
 <lista_deklaracija>				2/2
 <deklaracija>					1/1
 <lista_init_deklaratora>		2/2
-<init_deklarator>				0/2
+<init_deklarator>				0/2		?? ntip i tip
 <izravni_deklarator>			0/4
 <inicijalizator>				0/2
 <lista_izraza_pridruzivanja>	0/2
