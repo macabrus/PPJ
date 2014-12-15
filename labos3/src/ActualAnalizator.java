@@ -1,333 +1,182 @@
+
 /**
  * The class that actually analyzes (?)
- * @author Ivan
- * 
+ * @author Ivan Paljak
+ *
  */
 public class ActualAnalizator {
-
+	
 	private TreeNode root;
 	private TableNode scope;
-
-	private boolean error = false;
-
+	
+	private boolean error = false; 
+	
 	/**
 	 * Constructs class from root of generative tree
 	 * @param root Root of generative tree
 	 */
-	public ActualAnalizator(TreeNode root) {
+	public ActualAnalizator(TreeNode root){
 		this.root = root;
 		scope = new TableNode();
 	}
-
+	
 	public void analyze() {
 		prijevodnaJedinica(root);
-	}
-
+	} 
+	
 	private void prijevodnaJedinica(TreeNode node) {
 		if (node.getChildren().size() == 1) {
-			vanjskaDeklaracija(node.getChildAt(0));
-			if (error)
-				return;
+			vanjskaDeklaracija(node.getChildAt(0)); if (error) return;
 		} else {
-			prijevodnaJedinica(node.getChildAt(0));
-			if (error)
-				return;
-			vanjskaDeklaracija(node.getChildAt(1));
-			if (error)
-				return;
-
+			prijevodnaJedinica(node.getChildAt(0)); if (error) return;
+			vanjskaDeklaracija(node.getChildAt(1)); if (error) return;
+	
 		}
 	}
-
+	
 	private void vanjskaDeklaracija(TreeNode node) {
 		if (node.getChildAt(0).getContent().equals("<definicija_funkcije>")) {
-			definicijaFunkcije(node.getChildAt(0));
-			if (error)
-				return;
+			definicijaFunkcije(node.getChildAt(0)); if (error) return;
 		} else {
-			deklaracija(node.getChildAt(0));
-			if (error)
-				return;
+			deklaracija(node.getChildAt(0)); if (error) return;
 		}
 	}
-
+	
 	private void definicijaFunkcije(TreeNode node) {
-
+		
 		imeTipa(node.getChildAt(0));
-
+		
 		if (node.getChildAt(0).isConst()) {
 			printErrorMessage(node);
 			return;
 		}
-
-		if (existsFunctionBefore(scope, node.getFunctionName(), node.getType())) {
+	
+		if (existsFunctionBefore(scope, node.getFunctionName(), node.getType())){
 			printErrorMessage(node);
 			return;
 		}
-
+		
 		if (node.getChildAt(3).getContent().equals("KR_VOID")) {
-
+			
 			if (conflictingDeclaration(scope, node.getFunctionName(), node.getType())) {
 				printErrorMessage(node);
 				return;
 			}
-
+		
 			node.setDefined(true);
 			node.setType(node.getChildAt(0).getType());
-
-			slozenaNaredba(node.getChildAt(6));
-			if (error)
-				return;
-
+			
+			slozenaNaredba(node.getChildAt(6)); if (error) return;
+			
 			scope.addChild(node);
-
+			
+			
 		} else {
 
-			listaParametara(node.getChildAt(3));
-			if (error)
-				return;
-
+			listaParametara(node.getChildAt(3)); if (error) return;
+			
 			if (conflictingDeclaration(scope, node.getFunctionName(), node.getType())) {
 				printErrorMessage(node);
 				return;
 			}
-
+			
 			node.setDefined(true);
 			node.setType(node.getChildAt(0).getType());
-
+			
 			node.setTypes(node.getChildAt(3).getTypes());
 			node.setNames(node.getChildAt(3).getNames());
-
+			
 			scope.addChild(node);
-			slozenaNaredba(node.getChildAt(5));
-			if (error)
-				return;
-
+			slozenaNaredba(node.getChildAt(5)); if (error) return;
+		
 		}
-
+		
 	}
-
+	
 	private void deklaracija(TreeNode node) {
-		imeTipa(node.getChildAt(0));
-		if (error)
-			return;
+		imeTipa(node.getChildAt(0)); 
 		node.getChildAt(1).setType(node.getChildAt(0).getType());
 		listaInitDeklaratora(node.getChildAt(1));
 	}
-
+	
 	private void imeTipa(TreeNode node) {
 		specifikatorTipa(node.getChildAt(0));
 		if (node.getChildren().size() == 1) {
 			node.setType(node.getChildAt(0).getType());
 		} else {
 			TreeNode specTip = node.getChildAt(0);
-			if (specTip.getType().equals("void"))
-				printErrorMessage(node);
-			if (error)
-				return;
+			if (specTip.getType().equals("void")) printErrorMessage(node); if (error) return;
 			node.setType(node.getChildAt(0).getType());
 			node.setConst();
 		}
 	}
-
+	
 	private void slozenaNaredba(TreeNode node) {
-
+		
 		TableNode copyOfScope = new TableNode(scope.getParent());
 		copyOfScope.setDeclaredStuff(scope.getDeclaredStuff());
-
+		
 		TableNode newScope = new TableNode(copyOfScope);
 		scope = newScope;
-
+		
 		// gadna brija neka
-
+		
 		if (node.getChildren().size() == 3) {
-			listaNaredbi(node.getChildAt(1));
-			if (error)
-				return;
+			listaNaredbi(node.getChildAt(1)); if (error) return;
 		} else {
-			listaDeklaracija(node.getChildAt(1));
-			if (error)
-				return;
-			listaNaredbi(node.getChildAt(2));
-			if (error)
-				return;
+			listaDeklaracija(node.getChildAt(1)); if (error) return;
+			listaNaredbi(node.getChildAt(2)); if (error) return;
 		}
-
+		
 		scope = scope.getParent();
-
+		
 	}
-
-	private void deklaracijaParametra(TreeNode node) {
-		imeTipa(node);
-		if (error)
-			return;
-		if (node.getChildAt(0).getType().equals("void")) {
-			printErrorMessage(node);
-		}
-		// postavi tip i ime
-		if (node.getChildren().size() == 2) {
-			node.setType(node.getChildAt(0).getType());
-		} else {
-			node.setType("niz" + node.getChildAt(0).getType());
-		}
-		node.setName(node.getChildAt(1).getName());
-	}
-
+	
 	private void listaParametara(TreeNode node) {
 		if (node.getChildren().size() == 1) {
-			deklaracijaParametra(node.getChildAt(0));
-			if (error)
-				return;
+			deklaracijaParametara(node.getChildAt(0)); if (error) return;
 			node.addType(node.getChildAt(0).getType());
 			node.addName(node.getChildAt(0).getName());
 		} else {
-
-			listaParametara(node.getChildAt(0));
-			if (error)
-				return;
-			deklaracijaParametra(node.getChildAt(2));
-			if (error)
-				return;
-
-			if (node.getChildAt(0).getNames().contains(node.getChildAt(2).getName())) {
+			
+			listaParametara(node.getChildAt(0)); if (error) return;
+			deklaracijaParametara(node.getChildAt(2)); if (error) return;
+			
+			if(node.getChildAt(0).getNames().contains(node.getChildAt(2).getName())) {
 				printErrorMessage(node);
 				return;
 			}
-
+				
 			node.setTypes(node.getChildAt(0).getTypes());
 			node.addType(node.getChildAt(2).getType());
-
+		
 			node.setNames(node.getChildAt(0).getNames());
 			node.addName(node.getChildAt(2).getName());
-
+		
 		}
-	}
-
-	private void initDeklarator(TreeNode node) {
-		// nasljedno svojstvo prvo
-		node.getChildAt(0).setType(node.getType());
-		izravniDeklarator(node);
-		if (error)
-			return;
-		if (node.getChildren().size() == 1) {
-			// sad tu treba biti prvoDijete.tip =/= const
-			// "vazno je uociti da se provjerava izvedeno svojstvo tip, a ne nasljedno svojstvo ntip"
-			// znaci da ih treba razlikovati -.-
-		}
-	}
-
+	}	
+	
 	private void listaInitDeklaratora(TreeNode node) {
 		if (node.getChildren().size() == 1) {
 			node.getChildAt(0).setType(node.getType());
-			initDeklarator(node.getChildAt(0));
-			if (error)
-				return;
+			initDeklarator(node.getChildAt(0)); if (error) return;
 		} else {
-
+			
 			node.getChildAt(0).setType(node.getType());
-			listaInitDeklaratora(node.getChildAt(0));
-			if (error)
-				return;
-
+			listaInitDeklaratora(node.getChildAt(0)); if (error) return;
+			
 			node.getChildAt(2).setType(node.getType());
-			initDeklarator(node.getChildAt(2));
-			if (error)
-				return;
-
+			initDeklarator(node.getChildAt(2)); if (error) return;
+			
 		}
 	}
-
+	
 	private void specifikatorTipa(TreeNode node) {
-		if (node.getChildAt(0).equals("KR_VOID"))
-			node.setType("void");
-		if (node.getChildAt(0).equals("KR_CHAR"))
-			node.setType("char");
-		if (node.getChildAt(0).equals("KR_INT"))
-			node.setType("int");
+		if (node.getChildAt(0).equals("KR_VOID")) node.setType("void");
+		if (node.getChildAt(0).equals("KR_CHAR")) node.setType("char");
+		if (node.getChildAt(0).equals("KR_INT")) node.setType("int");
 	}
-
-	private void izrazPridruzivanja(TreeNode node) {
-		if (node.getChildren().size() == 1) {
-			logIliIzraz(node.getChildAt(0));
-			if (error)
-				return;
-			node.setType(node.getChildAt(0).getType());
-			node.setlValue(node.getChildAt(0).getlValue());
-		} else {
-			postfiksIzraz(node.getChildAt(0));
-			if (error)
-				return;
-			izrazPridruzivanja(node.getChildAt(2));
-			if (error)
-				return;
-			// provjeri ~
-			if (!isImplicitlyCastable(node.getChildAt(2), node.getChildAt(0).getType())) {
-				printErrorMessage(node);
-			}
-			node.setType(node.getChildAt(0).getType());
-			node.setlValue(false);
-		}
-	}
-
-	private void izraz(TreeNode node) {
-		if (node.getChildren().size() == 1) {
-			izrazPridruzivanja(node.getChildAt(0));
-			if (error)
-				return;
-			node.setType(node.getChildAt(0).getType());
-			node.setlValue(node.getChildAt(0).getlValue());
-		} else {
-			izraz(node.getChildAt(0));
-			if (error)
-				return;
-			izrazPridruzivanja(node.getChildAt(2));
-			if (error)
-				return;
-			node.setType(node.getChildAt(2).getType());
-			// ne znam jel trebamo ovo kao boolean ili int
-			node.setlValue(false);
-		}
-	}
-
-	private void izrazNaredba(TreeNode node) {
-		if (node.getChildren().size() == 1) {
-			node.setType("int");
-		} else {
-			izraz(node.getChildAt(1));
-			if (error)
-				return;
-			node.setType(node.getChildAt(1).getType());
-		}
-	}
-
-	private void naredba(TreeNode node) {
-		if (node.getChildAt(0).equals("<slozena_naredba>")) {
-			slozenaNaredba(node.getChildAt(0));
-			if (error)
-				return;
-		}
-		if (node.getChildAt(0).equals("<izraz_naredba>")) {
-			izrazNaredba(node.getChildAt(0));
-			if (error)
-				return;
-		}
-		if (node.getChildAt(0).equals("<naredba_grananja>")) {
-			naredbaGrananja(node.getChildAt(0));
-			if (error)
-				return;
-		}
-		if (node.getChildAt(0).equals("<naredba_petlje>")) {
-			naredbaPetlje(node.getChildAt(0));
-			if (error)
-				return;
-		}
-		if (node.getChildAt(0).equals("<naredba_skoka>")) {
-			naredbaSkoka(node.getChildAt(0));
-			if (error)
-				return;
-		}
-	}
-
+	
 	private void listaNaredbi(TreeNode node) {
 		if (node.getChildren().size() == 1) {
 			naredba(node.getChildAt(0));
@@ -336,7 +185,7 @@ public class ActualAnalizator {
 			naredba(node.getChildAt(1));
 		}
 	}
-
+	
 	private void listaDeklaracija(TreeNode node) {
 		if (node.getChildren().size() == 1) {
 			deklaracija(node.getChildAt(0));
@@ -345,64 +194,436 @@ public class ActualAnalizator {
 			deklaracija(node.getChildAt(1));
 		}
 	}
-
+	
+	private void deklaracijaParametara(TreeNode node) {
+		imeTipa(node.getChildAt(0)); if (error) return;
+		if (node.getChildAt(0).getType().equals("void")) {
+			printErrorMessage(node);
+			return;
+		}
+		if (node.getChildren().size() == 2) {
+			node.setType(node.getChildAt(0).getType());
+		} else {
+			node.setType("niz" + node.getChildAt(0).getType());
+		}
+		node.setName(node.getChildAt(0).getName());
+	}
+	
+	private void initDeklarator(TreeNode node) {
+		node.getChildAt(0).setType(node.getType());
+		izravniDeklarator(node.getChildAt(0)); if (error) return;
+		if (node.getChildren().size() == 1) {
+			if (node.getChildAt(0).isConst()) {
+				printErrorMessage(node);
+				return;
+			}
+		} else {
+			inicijalizator(node.getChildAt(2)); if (error) return;
+			if (node.getChildAt(0).isArray()) {
+				if (node.getChildAt(0).getArraySize() < node.getChildAt(2).getArraySize()) error = true;
+				for (String type1 : node.getChildAt(2).getTypes()) {
+					if (!isCastable(type1, node.getChildAt(0).getType())) error = true;
+				}
+				if (error) {
+					printErrorMessage(node);
+					return;
+				}
+			} else {
+				if (!isCastable(node.getChildAt(2).getType(), node.getType())) {
+					printErrorMessage(node);
+					return;
+				}
+			}
+		}
+	}
+	
+	private void naredba(TreeNode node) {
+		TreeNode rightSide = node.getChildAt(0);
+		if (rightSide.getContent().equals("<slozena_naredba>")) slozenaNaredba(rightSide);
+		if (rightSide.getContent().equals("<izraz_naredba>")) izrazNaredba(rightSide);
+		if (rightSide.getContent().equals("<naredba_grananja>")) naredbaGrananja(rightSide);
+		if (rightSide.getContent().equals("<naredba_petlje>")) naredbaPetlje(rightSide);
+		if (rightSide.getContent().equals("<naredba_skoka>")) naredbaSkoka(rightSide);
+	}
+	
+	private void izravniDeklarator(TreeNode node) {
+		if (node.getChildren().size() == 1) {
+			if (node.getType().equals("void") || isDeclaredLocally(node.getName())) {
+				printErrorMessage(node);
+				return;
+			}
+			node.setDefined(false);
+			scope.addChild(node);
+			return;
+		} 
+		if (node.getChildAt(2).getContent().equals("BROJ")) {
+			if (node.getType().equals("void") || isDeclaredLocally(node.getName())) {
+				printErrorMessage(node);
+				return;
+			}
+			if (node.getChildAt(2).getNumberValue() <= 0 || node.getChildAt(2).getNumberValue() > 1024) {
+				printErrorMessage(node);
+				return;
+			}
+			node.setType("niz" + node.getType());
+			node.setArraySize(node.getChildAt(2).getNumberValue());
+			scope.addChild(node);
+		}
+		if (node.getChildAt(2).getContent().equals("KR_VOID")) {
+			TreeNode localDef = getLocalDeclaration(node.getChildAt(0).getName());
+			if (localDef == null) {
+				node.addType("void");
+				scope.addChild(node);
+			} else {
+				if (localDef.getTypes().size() != 1 || !localDef.getTypeAt(0).equals("void")) {
+					printErrorMessage(node);
+					return;
+				}
+				node.addType("void");
+			}
+		} 
+		if (node.getChildAt(2).getContent().equals("<lista_parametara>")) {
+			listaParametara(node.getChildAt(2)); if (error) return;
+			TreeNode localDec = getLocalDeclaration(node.getChildAt(0).getName());
+			if (localDec == null) {
+				if (!checkTypes(localDec, node.getChildAt(2))) {
+					printErrorMessage(node);
+					return;
+				}
+				node.setTypes(node.getChildAt(2).getTypes());
+			} else {
+				node.setTypes(node.getChildAt(2).getTypes());
+				scope.addChild(node);
+			}
+		}
+	}
+	
+	private void inicijalizator(TreeNode node) {
+		if (node.getChildren().size() == 1) {
+			izrazPridruzivanja(node.getChildAt(0)); if (error) return;
+			if (ideUNizZnakova(node.getChildAt(0))) {
+				node.setArraySize(izracunajDuljinuZnakova(node));
+				for (int i = 0; i < node.getArraySize(); ++i) node.addType("char");
+			} else {
+				node.setType(node.getChildAt(0).getType());
+			}
+		} else {
+			listaIzrazaPridruzivanja(node.getChildAt(1)); if (error) return;
+			node.setArraySize(node.getChildAt(1).getArraySize());
+			node.setTypes(node.getChildAt(1).getTypes());
+		}
+	}
+	
+	private void izrazNaredba(TreeNode node) {
+		if (node.getChildren().size() == 1) {
+			node.setType("int");
+		} else {
+			izraz(node.getChildAt(0)); if (error) return;
+			node.setType(node.getChildAt(0).getType());
+		}
+	}
+	
+	private void naredbaGrananja(TreeNode node) {
+		
+		izraz(node.getChildAt(2)); if (error) return;
+		if (!isCastable(node.getChildAt(2).getType(), "int")) {
+			printErrorMessage(node);
+			return;
+		}
+		naredba(node.getChildAt(4)); if (error) return;
+		
+		if (node.getChildren().size() > 5) {
+			naredba(node.getChildAt(6)); if (error) return;
+		}
+	} 
+	
+	private void naredbaPetlje(TreeNode node) {
+		if (node.getChildren().size() == 5) {
+			izraz(node.getChildAt(2)); if (error) return;
+			if (!isCastable(node.getChildAt(2).getType(), "int")) {
+				printErrorMessage(node);
+				return;
+			}
+			naredba(node.getChildAt(4)); if (error) return;
+		}
+		if (node.getChildren().size() == 6) {
+			izrazNaredba(node.getChildAt(2)); if (error) return;
+			izrazNaredba(node.getChildAt(3)); if (error) return;
+			if (!isCastable(node.getChildAt(3).getType(), "int")) {
+				printErrorMessage(node);
+				return;
+			}
+			naredba(node.getChildAt(5)); if (error) return;
+		}
+		if (node.getChildren().size() == 7) {
+			izrazNaredba(node.getChildAt(2)); if (error) return;
+			izrazNaredba(node.getChildAt(3)); if (error) return;
+			if (!isCastable(node.getChildAt(3).getType(), "int")) {
+				printErrorMessage(node);
+				return;
+			}
+			izraz(node.getChildAt(4)); if (error) return;
+			naredba(node.getChildAt(6)); if (error) return;
+		}
+	}
+	
+	private void naredbaSkoka(TreeNode node) {
+		// TODO izgleda malo sjebano
+	}
+	
+	private void izrazPridruzivanja(TreeNode node) {
+		if (node.getChildren().size() == 1) {
+			logIliIzraz(node.getChildAt(0)); if (error) return;
+			node.setType(node.getChildAt(0).getType());
+			node.setLValue(node.getChildAt(0).getLValue());
+		} else {
+			postfiksIzraz(node.getChildAt(0)); if (error) return;
+			if (!node.getChildAt(0).getLValue()) {
+				printErrorMessage(node);
+				return;
+			} 
+			izrazPridruzivanja(node.getChildAt(2)); if (error) return;
+			if (!isCastable(node.getChildAt(2).getType(), node.getChildAt(0).getType())) {
+				printErrorMessage(node);
+				return;
+			}
+			node.setType(node.getChildAt(0).getType());
+			node.setLValue(false);
+		}
+	}
+	
+	private void listaIzrazaPridruzivanja(TreeNode node){
+		if (node.getChildren().size() == 1) {
+			izrazPridruzivanja(node.getChildAt(0)); if (error) return;
+			node.addType(node.getChildAt(0).getType());
+			node.setArraySize(1);
+		} else {
+			listaIzrazaPridruzivanja(node.getChildAt(0)); if (error) return;
+			izrazPridruzivanja(node.getChildAt(2)); if (error) return;
+			node.setTypes(node.getChildAt(0).getTypes());
+			node.addType(node.getChildAt(2).getType());
+			node.setArraySize(node.getChildAt(0).getArraySize() + 1);
+		}
+	}
+	
+	private void izraz(TreeNode node) {
+		if (node.getChildren().size() == 1) {
+			izrazPridruzivanja(node.getChildAt(0)); if (error) return;
+			node.setType(node.getChildAt(0).getType());
+			node.setLValue(node.getChildAt(0).getLValue());
+		} else {
+			izraz(node.getChildAt(0)); if (error) return;
+			izrazPridruzivanja(node.getChildAt(2)); if (error) return;
+			node.setType(node.getChildAt(2).getType());
+			node.setLValue(false);
+		}
+	}
+	
+	private void logIliIzraz(TreeNode node) {
+		if (node.getChildren().size() == 1) {
+			logIIzraz(node.getChildAt(0)); if (error) return;
+			node.setType(node.getChildAt(0).getType());
+			node.setLValue(node.getChildAt(0).getLValue());
+		} else {
+			logIliIzraz(node.getChildAt(0)); if (error) return;
+			if (!isCastable(node.getChildAt(0).getType(), "int")) {
+				printErrorMessage(node);
+				return;
+			}
+			logIIzraz(node.getChildAt(2)); if (error) return; 
+			if (!isCastable(node.getChildAt(2).getType(), "int")) {
+				printErrorMessage(node);
+				return;
+			}
+			node.setType("int");
+			node.setLValue(false);
+		}
+	}
+	
+	private void postfiksIzraz(TreeNode node) {
+		if (node.getChildren().size() == 1) {
+			primarniIzraz(node.getChildAt(0)); if (error) return;
+			node.setType(node.getChildAt(0).getType());
+			node.setLValue(node.getChildAt(0).getLValue());
+		}
+		if (node.getChildAt(1).getContent().equals("L_UGL_ZAGRADA")) {
+			postfiksIzraz(node.getChildAt(0));
+			String X;
+			boolean isConst;
+			if (!node.getChildAt(0).getType().startsWith("niz")) {
+				printErrorMessage(node);
+				return;
+			}
+			X = node.getChildAt(0).getType().substring(3);
+			isConst = node.getChildAt(0).isConst();
+			izraz(node.getChildAt(2)); if (error) return;
+			if (!isCastable(node.getChildAt(2).getType(), "int")) {
+				printErrorMessage(node);
+				return;
+			}
+			node.setType(X);
+			node.setLValue(!isConst);
+			return;
+		}
+		if (node.getChildren().size() == 3) {
+			postfiksIzraz(node.getChildAt(0)); if (error) return;
+			if (!node.getChildAt(0).isFunction() || !node.getChildAt(0).getTypeAt(0).equals("void")) {
+				printErrorMessage(node);
+				return;
+			}
+			node.setType(node.getChildAt(0).getType());
+			node.setLValue(false);
+		}
+		if (node.getChildren().size() == 4){
+			postfiksIzraz(node.getChildAt(0)); if (error) return; 
+			listaArgumenata(node.getChildAt(2)); if (error) return;
+			if (!node.getChildAt(0).isFunction()) {
+				printErrorMessage(node);
+				return;
+			}
+			TreeNode pIzraz = node.getChildAt(0);
+			TreeNode listArg = node.getChildAt(2);
+			if (pIzraz.getTypes().size() != listArg.getTypes().size()) {
+				printErrorMessage(node);
+				return;
+			}
+			for (int i = 0; i < pIzraz.getTypes().size(); ++i) {
+				 if (!isCastable(listArg.getTypeAt(i), pIzraz.getTypeAt(i))) {
+					 printErrorMessage(node);
+					 return;
+				 }
+			}
+			node.setType(pIzraz.getType());
+			node.setLValue(false);
+		}
+		if (node.getChildren().size() == 2) {
+			postfiksIzraz(node.getChildAt(0)); if (error) return;
+			TreeNode pIzraz = node.getChildAt(0);
+			if (!pIzraz.getLValue() || !isCastable(pIzraz.getType(), "int")) {
+				printErrorMessage(node);
+				return;
+			}
+			node.setType("int");
+			node.setLValue(false);
+		}
+	} 
+	
+	private void logIIzraz(TreeNode node) {
+		if (node.getChildren().size() == 1) {
+			binIliIzraz(node.getChildAt(0)); if (error) return;
+			node.setType(node.getChildAt(0).getType());
+			node.setLValue(node.getChildAt(0).getLValue());
+		} else {
+			logIIzraz(node.getChildAt(0)); if (error) return;
+			if (!isCastable(node.getChildAt(0).getType(), "int")) {
+				printErrorMessage(node);
+				return;
+			}
+			binIliIzraz(node.getChildAt(2)); if (error) return;
+			if (!isCastable(node.getChildAt(2).getType(), "int")) {
+				printErrorMessage(node);
+				return;
+			}
+			node.setType("int");
+			node.setLValue(false);
+		}
+	}
+	
+	private void primarniIzraz(TreeNode node) {
+		TreeNode prvo = node.getChildAt(0);
+		if (prvo.getContent().equals("IDN")) {
+			// neda mi se vise :)
+		}
+	}
+	
+	// Helper functions START HERE
+	
+	private int izracunajDuljinuZnakova(TreeNode node) {
+		while (!node.getChildren().isEmpty()) {
+			node = node.getChildAt(0);
+		}
+		return node.getContent().split(" ")[2].length() - 2;	
+	}
+	
+	private boolean ideUNizZnakova(TreeNode node) {
+		while (!node.getChildren().isEmpty()) {
+			if (node.getChildren().size() != 1) return false;
+			node = node.getChildAt(0);
+		}
+		return node.getContent().equals("NIZ_ZNAKOVA");
+	} 
+	
+	private boolean checkTypes(TreeNode n1, TreeNode n2) {
+		if (n1.getTypes().size() != n2.getTypes().size()) return false;
+		for (int i = 0; i < n1.getTypes().size(); ++i) {
+			if (!n1.getTypeAt(i).equals(n2.getTypeAt(i))) return false;
+		}
+		return true;
+	}
+	
+	private TreeNode getLocalDeclaration(String name) {
+		for (TreeNode declaration : scope.getDeclaredStuff()) {
+			if (declaration.getName().equals(name)) return declaration;
+		}
+		return null;
+	}
+	
+	private boolean isDeclaredLocally(String name) {
+		for (TreeNode declaration : scope.getDeclaredStuff()) {
+			if (declaration.getName().equals(name)) return true;
+		}
+		return false;
+	}
+	
 	private boolean existsFunctionBefore(TableNode node, String funName, String funType) {
+	
 		TableNode prevNode = node;
 		node = node.getParent();
 		while (node != null) {
 			for (TreeNode d : node.getDeclaredStuff()) {
-				if (d.isFunction() && d.getFunctionName().equals(funName) && d.isFunctionDefined())
-					return true;
+				if (d.isFunction() && d.getFunctionName().equals(funName)
+						&& d.isFunctionDefined()) return true;
 			}
 			prevNode = node;
 			node = node.getParent();
 		}
-
+	
 		return false;
 	}
-
+	
 	private boolean conflictingDeclaration(TableNode node, String funName, String funType) {
-		while (node.getParent() != null)
-			node = node.getParent();
-
+		
+		while (node.getParent() != null) node = node.getParent();
+		
 		for (TreeNode d : node.getDeclaredStuff()) {
-			if (d.isFunction() && d.getFunctionName().equals(funName) && !d.getType().equals(funType))
-				return true;
+			if (d.isFunction() && d.getFunctionName().equals(funName) && 
+					!d.getType().equals(funType)) return true;
 		}
-
+		
 		return false;
-
+		
 	}
-
+	
+	/**
+	 * Checks whether type1 is implicitly castable into type2 (~)
+	 * 
+	 * @param type1 first type
+	 * @param type2 second type
+	 * @return :)
+	 */
+	private boolean isCastable(String type1, String type2) {
+		return type1.equals(type2) || (type1.equals("char") && type2.equals("int"));
+	}
+	
 	/**
 	 * 
 	 * @param node
 	 */
 	private void printErrorMessage(TreeNode node) {
-		System.out.println(node.getContent() + " ::= " + node);
+		System.out.println(node.getContent() + " ::= " +  node);
 		error = true;
 	}
-
-	/**
-	 * Method that returns whether t1 can be implicitly cast to t2.
-	 * @param t1
-	 * @param t2
-	 * @return Possible cast or not
-	 */
-	private boolean isImplicitlyCastable(TreeNode t1, String t2) {
-		// const(T) ~ T
-		if (!t1.getType().startsWith("niz") && t1.isConst()) {
-			return true;
-		}
-		// char ~ int
-		if (t1.getType().equals("char") && t2.equals("int")) {
-			return true;
-		}
-		// niz(T) ~ niz(const(T)), ako T =/= const
-		if (!t1.isConst() && t1.getType().startsWith("niz")) {
-			return true;
-		}
-		return false;
-	}
-
+	
+	// Helper functions END HERE
+	
 }
