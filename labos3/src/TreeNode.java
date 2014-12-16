@@ -18,7 +18,6 @@ public class TreeNode {
 	private boolean lValue;
 	private boolean isConstant;
 	private boolean isDefined;
-	private boolean isConst;
 	
 	private int arraySize = -1;
 	
@@ -163,7 +162,7 @@ public class TreeNode {
 	} 
 	
 	public void setConst() {
-		this.isConst = true;
+		this.isConstant = true;
 	}
 	
 	public void setArraySize(int x) {

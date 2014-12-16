@@ -94,7 +94,7 @@ public class ActualAnalizator {
 	}
 	
 	private void deklaracija(TreeNode node) {
-		imeTipa(node.getChildAt(0)); 
+		imeTipa(node.getChildAt(0)); if (error) return;
 		node.getChildAt(1).setType(node.getChildAt(0).getType());
 		listaInitDeklaratora(node.getChildAt(1));
 	}
