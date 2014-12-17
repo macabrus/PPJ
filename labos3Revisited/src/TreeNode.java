@@ -229,7 +229,14 @@ public class TreeNode {
 	@Override
 	public String toString() {
 		String ret = "";
-		for (TreeNode child : children) ret += child.getContent() + " ";
+		for (TreeNode child : children) {
+			if (child.getContent().charAt(0) != '<') {
+				String[] dubrovnik = child.getContent().split(" ");
+				ret += dubrovnik[0] + "(" + dubrovnik[1] + "," + dubrovnik[2] + ")" + " ";
+			} else {
+				ret += child.getContent() + " ";
+			}
+		}
 		return ret;
 	}
 	

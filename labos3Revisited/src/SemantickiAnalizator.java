@@ -19,7 +19,8 @@ public class SemantickiAnalizator {
 		TreeParser parser = new TreeParser(inputFileContents);
 		rootOfGenerativeTree = parser.getRoot();
 		
-		rootOfGenerativeTree.printSubtree(0);
+		// Provjereno da radi na svim primjerima 
+		// rootOfGenerativeTree.printSubtree(0);
 		
 		ActualAnalizator analizator = new ActualAnalizator(rootOfGenerativeTree);
 		analizator.analyze();

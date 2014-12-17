@@ -1,3 +1,4 @@
+import java.io.ObjectInputStream.GetField;
 import java.math.BigInteger;
 import java.util.ArrayList;
 
@@ -57,6 +58,7 @@ public class ActualAnalizator {
 				return;
 			}
 			node.setType("int");
+		//	node.setName(init.getName());
 			node.setLValue(false);
 		}
 		if (init.getContent().startsWith("ZNAK")) {
@@ -65,6 +67,7 @@ public class ActualAnalizator {
 				return;
 			}
 			node.setType("char");
+		//	node.setName(init.getName());
 			node.setLValue(false);
 		}
 		if (init.getContent().startsWith("NIZ_ZNAKOVA")) {
@@ -74,6 +77,7 @@ public class ActualAnalizator {
 			}
 			node.setType("nizchar");
 			node.setConst();
+		//	node.setName(init.getName());
 			node.setLValue(false);
 		}
 		if (init.getContent().startsWith("L_ZAGRADA")) {
@@ -199,7 +203,7 @@ public class ActualAnalizator {
 			node.setType(node.getChildAt(0).getType(scope));
 			node.setTypes(node.getChildAt(0).getTypes(scope));
 			node.setName(node.getChildAt(0).getName());
-			node.setLValue(node.getChildAt(0).getLValue(scope));
+			node.setLValue(node.getChildAt(0).getLValue(scope));	
 		} else {
 			imeTipa(node.getChildAt(1)); if (error) return;
 			castIzraz(node.getChildAt(3)); if (error) return;
@@ -238,7 +242,9 @@ public class ActualAnalizator {
 		if (node.getChildren().size() == 1) {
 			castIzraz(node.getChildAt(0)); if (error) return;
 			node.setType(node.getChildAt(0).getType(scope));
-			node.setLValue(node.getChildAt(0).getLValue(scope));
+			node.setTypes(node.getChildAt(0).getTypes(scope));
+			node.setName(node.getChildAt(0).getName());
+			node.setLValue(node.getChildAt(0).getLValue(scope));	
 		} else {
 			multiplikativniIzraz(node.getChildAt(0)); if (error) return;
 			if (!isCastable(node.getChildAt(0).getType(scope), "int")) {
@@ -259,6 +265,8 @@ public class ActualAnalizator {
 		if (node.getChildren().size() == 1) {
 			multiplikativniIzraz(node.getChildAt(0)); if (error) return;
 			node.setType(node.getChildAt(0).getType(scope));
+			node.setTypes(node.getChildAt(0).getTypes(scope));
+			node.setName(node.getChildAt(0).getName());
 			node.setLValue(node.getChildAt(0).getLValue(scope));
 		} else {
 			aditivniIzraz(node.getChildAt(0)); if (error) return;
@@ -280,6 +288,8 @@ public class ActualAnalizator {
 		if (node.getChildren().size() == 1) {
 			aditivniIzraz(node.getChildAt(0)); if (error) return;
 			node.setType(node.getChildAt(0).getType(scope));
+			node.setTypes(node.getChildAt(0).getTypes(scope));
+			node.setName(node.getChildAt(0).getName());
 			node.setLValue(node.getChildAt(0).getLValue(scope));
 		} else {
 			odnosniIzraz(node.getChildAt(0)); if (error) return;
@@ -301,15 +311,17 @@ public class ActualAnalizator {
 		if (node.getChildren().size() == 1) {
 			odnosniIzraz(node.getChildAt(0)); if (error) return;
 			node.setType(node.getChildAt(0).getType(scope));
+			node.setTypes(node.getChildAt(0).getTypes(scope));
+			node.setName(node.getChildAt(0).getName());
 			node.setLValue(node.getChildAt(0).getLValue(scope));
 		} else {
 			jednakosniIzraz(node.getChildAt(0)); if (error) return;
-			if (!isCastable(node.getChildAt(0).getType(scope), "int")) {
+			if (node.getChildAt(0).isFunction() || !isCastable(node.getChildAt(0).getType(scope), "int")) {
 				printErrorMessage(node);
 				return;
 			}
 			odnosniIzraz(node.getChildAt(2)); if (error) return;
-			if (!isCastable(node.getChildAt(2).getType(scope), "int")) {
+			if (node.getChildAt(2).isFunction() || !isCastable(node.getChildAt(2).getType(scope), "int")) {
 				printErrorMessage(node);
 				return;
 			}
@@ -431,7 +443,6 @@ public class ActualAnalizator {
 		} else {
 			postfiksIzraz(node.getChildAt(0)); if (error) return;
 			if (!node.getChildAt(0).getLValue(scope)) {
-				System.out.println("njanja");
 				printErrorMessage(node);
 				return;
 			} 
@@ -472,6 +483,16 @@ public class ActualAnalizator {
 		
 		TableNode newScope = new TableNode(copyOfScope);
 		scope = newScope;
+		
+		// System.out.println(node.getTypes(scope).size());
+		// System.out.println(node.getNames().size());
+		
+		for (int i = 0; i < node.getTypes(scope).size(); ++i) {
+			TreeNode newNode = new TreeNode(-1, "<" + node.getNames().get(i));
+			newNode.setType(node.getTypes(scope).get(i));
+			newNode.setName(node.getNames().get(i));
+			scope.addChild(newNode);
+		}
 		
 		// gadna brija neka
 		
@@ -563,6 +584,14 @@ public class ActualAnalizator {
 				printErrorMessage(node);
 				return;
 			}
+		} else {
+			if (node.getChildAt(0).getContent().startsWith("KR_RETURN")) {
+				//ArrayList<String> parameters = getTypesOfCurrentFunction();
+				if (!getTypeOfCurrentFunction().equals("void")) {
+					printErrorMessage(node);
+					return;
+				}
+			} 
 		}
 	}
 	
@@ -598,7 +627,7 @@ public class ActualAnalizator {
 			printErrorMessage(node);
 			return;
 		}
-		if (existsFunctionBefore(scope, node.getChildAt(0).getName(), node.getType(scope))){
+		if (existsFunctionBefore(scope, node.getChildAt(1).getName(), node.getType(scope))){
 			printErrorMessage(node);
 			return;
 		}
@@ -624,8 +653,19 @@ public class ActualAnalizator {
 			node.setDefined(true);
 			node.setType(node.getChildAt(0).getType(scope));
 			node.setName(node.getChildAt(1).getName());
-			node.setTypes(node.getChildAt(3).getTypes(scope));
+			node.getChildAt(5).setTypes(node.getChildAt(3).getTypes(scope));
+			node.setTypes(node.getChildAt(3).getTypes(scope));			
+			node.getChildAt(5).setNames(node.getChildAt(3).getNames());
 			node.setNames(node.getChildAt(3).getNames());
+			
+			/*
+			System.out.println("Types: ");
+			for (String type : node.getChildAt(5).getTypes(scope)) System.out.println(type);
+			
+			System.out.println("Names: ");
+			for (String name : node.getChildAt(5).getNames()) System.out.println(name);
+			*/
+			
 			definedFunctions.add(node.getName());
 			scope.addChild(node);
 			slozenaNaredba(node.getChildAt(5)); if (error) return;
@@ -885,14 +925,15 @@ public class ActualAnalizator {
 	
 	private boolean existsFunctionBefore(TableNode node, String funName, String funType) {
 	
-		TableNode prevNode = node;
-		node = node.getParent();
+		//TableNode prevNode = node;
+		//node = node.getParent();
+		
 		while (node != null) {
 			for (TreeNode d : node.getDeclaredStuff()) {
 				if (d.isFunction() && d.getFunctionName().equals(funName)
 						&& d.isFunctionDefined()) return true;
 			}
-			prevNode = node;
+			//prevNode = node;
 			node = node.getParent();
 		}
 	
@@ -960,12 +1001,27 @@ public class ActualAnalizator {
 			for (int i = node.getDeclaredStuff().size() - 1; i >= 0; --i) {
 				TreeNode declaration = node.getDeclaredStuff().get(i);
 				if (declaration.isFunction() && declaration.isFunctionDefined()) {
-					return declaration.getType(scope);
+					return declaration.getType(node);
 				}
 			}
 			node = node.getParent();
 		}
 		return "";
+	}
+	
+	private ArrayList<String> getTypesOfCurrentFunction() {
+		TableNode node = new TableNode();
+		node = scope;
+		while (node != null) {
+			for (int i = node.getDeclaredStuff().size() - 1; i >= 0; --i) {
+				TreeNode declaration = node.getDeclaredStuff().get(i);
+				if (declaration.isFunction() && declaration.isFunctionDefined()) {
+					return declaration.getTypes(scope);
+				}
+			}
+			node = node.getParent();
+		}
+		return new ArrayList<String>();	
 	}
 	
 	public boolean gotError() {
