@@ -21,6 +21,19 @@ public class SemantickiAnalizator {
 		
 		rootOfGenerativeTree.printSubtree(0);
 		
+		ActualAnalizator analizator = new ActualAnalizator(rootOfGenerativeTree);
+		analizator.analyze();
+		
+		if (!analizator.gotError()) {
+			// main
+			if (analizator.noMain()) {
+				System.out.println("main");
+			} else {
+				if (analizator.functionError()) System.out.println("funkcija");
+				//System.out.println("function");
+			}
+		}
+		
 	}
 	
 }

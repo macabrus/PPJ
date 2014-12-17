@@ -21,8 +21,8 @@ public class TreeNode {
 	
 	private int arraySize = -1;
 	
-	private String type;
-	private String name;
+	private String type = "";
+	private String name = "";
 	
 	private ArrayList<String> types = new ArrayList<String>(); 
 	private ArrayList<String> names = new ArrayList<String>();
@@ -110,14 +110,26 @@ public class TreeNode {
 	
 	public String getFunctionName() {
 		if (!this.isFunction()) System.err.println("Greska koja se nebi smjela dogodit!");
-		return this.getChildAt(2).getContent();
+		return this.getName();
+		// return this.getChildAt(2).getContent();
  	}
 	
-	public String getType() {
+	public String getType(TableNode scope) {
+		if (this.getContent().startsWith("IDN")) {
+			TableNode node = new TableNode();
+			node = scope;
+			while (node != null) {
+				for (TreeNode declaration : node.getDeclaredStuff()) {
+					if (declaration.getName().equals(this.getName())) return declaration.getType(null);
+				}
+				node = node.getParent();
+			}
+		}
 		return type;
 	}
 	
 	public String getName() {
+		if (this.getContent().charAt(0) != '<') return this.getContent().split(" ")[2];
 		return name;
 	}
 	
@@ -137,7 +149,17 @@ public class TreeNode {
 		isDefined = x;
 	}
 	
-	public ArrayList<String> getTypes() {
+	public ArrayList<String> getTypes(TableNode scope) {
+		if (this.getContent().startsWith("IDN")) {
+			TableNode node = new TableNode();
+			node = scope;
+			while (node != null) {
+				for (TreeNode declaration : node.getDeclaredStuff()) {
+					if (declaration.getName().equals(this.getName())) return declaration.getTypes(null);
+				}
+				node = node.getParent();
+			}
+		}
 		return this.types;
 	}
 	
@@ -178,7 +200,17 @@ public class TreeNode {
 		// return arraySize != -1;
 	}
 	
-	public boolean getLValue() {
+	public boolean getLValue(TableNode scope) {
+		if (this.getContent().startsWith("IDN")) {
+			TableNode node = new TableNode();
+			node = scope;
+			while (node != null) {
+				for (TreeNode declaration : node.getDeclaredStuff()) {
+					if (declaration.getName().equals(this.getName())) return declaration.getLValue(null);
+				}
+				node = node.getParent();
+			}
+		}
 		return lValue;
 	}
 	
