@@ -18,6 +18,7 @@ public class TreeNode {
 	private boolean lValue;
 	private boolean isConstant;
 	private boolean isDefined;
+	private boolean inLoop;
 	
 	private int arraySize = -1;
 	
@@ -104,12 +105,10 @@ public class TreeNode {
 	}
 	
 	public boolean isFunctionDefined() {
-		if (!this.isFunction()) System.err.println("Greska koja se nebi smjela dogodit!");
 		return this.isDefined;
 	}
 	
 	public String getFunctionName() {
-		if (!this.isFunction()) System.err.println("Greska koja se nebi smjela dogodit!");
 		return this.getName();
 		// return this.getChildAt(2).getContent();
  	}
@@ -215,6 +214,14 @@ public class TreeNode {
 		}
 		return lValue;
 	}
+	
+	public boolean isInLoop(){
+		return inLoop;
+	}
+	
+	public void setLoop() {
+		inLoop = true;
+	} 
 	
 	public void setLValue(boolean x) {
 		lValue = x;

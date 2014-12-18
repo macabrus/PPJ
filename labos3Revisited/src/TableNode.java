@@ -8,6 +8,8 @@ import java.util.ArrayList;
  */
 public class TableNode {
 
+	private boolean inLoop = false;
+	
 	private TableNode parent;
 	private ArrayList<TreeNode> declaredStuff; // jos nisam zicer dal je fakat TreeNode
 	
@@ -25,6 +27,7 @@ public class TableNode {
 	 */
 	public TableNode(TableNode parent){
 		this.parent = parent;
+		//if (parent != null) this.inLoop = parent.inLoop;
 		this.declaredStuff = new ArrayList<TreeNode>();
 	}
 
@@ -44,6 +47,13 @@ public class TableNode {
 		declaredStuff.add(node);
 	}
 	
+	public void setLoop() {
+		inLoop = true;
+	}
+	
+	public boolean isInLoop() {
+		return inLoop;
+	}
 	
 	
 }

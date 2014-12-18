@@ -31,7 +31,6 @@ public class SemantickiAnalizator {
 				System.out.println("main");
 			} else {
 				if (analizator.functionError()) System.out.println("funkcija");
-				System.out.println("funkcija");
 			}
 		}
 		

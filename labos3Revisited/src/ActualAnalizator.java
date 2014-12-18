@@ -494,9 +494,13 @@ public class ActualAnalizator {
 	private void slozenaNaredba(TreeNode node) {
 		TableNode copyOfScope = new TableNode(scope.getParent());
 		copyOfScope.setDeclaredStuff(scope.getDeclaredStuff());
+		if (scope.isInLoop()) copyOfScope.setLoop();
 		
 		TableNode newScope = new TableNode(copyOfScope);
+		if (node.isInLoop() || scope.isInLoop()) newScope.setLoop();
 		scope = newScope;
+		
+		if (node.isInLoop()) scope.setLoop();
 		
 		// System.out.println(node.getTypes(scope).size());
 		// System.out.println(node.getNames().size());
@@ -504,6 +508,7 @@ public class ActualAnalizator {
 		for (int i = 0; i < node.getTypes(scope).size(); ++i) {
 			TreeNode newNode = new TreeNode(-1, "<" + node.getNames().get(i));
 			newNode.setType(node.getTypes(scope).get(i));
+			if (node.isInLoop()) newNode.setLoop();
 			newNode.setName(node.getNames().get(i));
 			scope.addChild(newNode);
 		}
@@ -513,6 +518,7 @@ public class ActualAnalizator {
 		if (node.getChildren().size() == 3) {
 			listaNaredbi(node.getChildAt(1)); if (error) return;
 		} else {
+			if (node.isInLoop()) node.getChildAt(1).setLoop();
 			listaDeklaracija(node.getChildAt(1)); if (error) return;
 			listaNaredbi(node.getChildAt(2)); if (error) return;
 		}
@@ -521,20 +527,22 @@ public class ActualAnalizator {
 	
 	private void listaNaredbi(TreeNode node) {
 		if (node.getChildren().size() == 1) {
-			naredba(node.getChildAt(0));
+			naredba(node.getChildAt(0)); if (error) return;
 		} else {
-			listaNaredbi(node.getChildAt(0));
-			naredba(node.getChildAt(1));
+			listaNaredbi(node.getChildAt(0)); if (error) return;
+			naredba(node.getChildAt(1)); if (error) return;
 		}
 	}
 	
 	private void naredba(TreeNode node) {
 		TreeNode rightSide = node.getChildAt(0);
+		if (node.isInLoop()) rightSide.setLoop();
 		if (rightSide.getContent().equals("<slozena_naredba>")) slozenaNaredba(rightSide);
 		if (rightSide.getContent().equals("<izraz_naredba>")) izrazNaredba(rightSide);
 		if (rightSide.getContent().equals("<naredba_grananja>")) naredbaGrananja(rightSide);
 		if (rightSide.getContent().equals("<naredba_petlje>")) naredbaPetlje(rightSide);
 		if (rightSide.getContent().equals("<naredba_skoka>")) naredbaSkoka(rightSide);
+		if (error) return;
 	}
 	
 	private void izrazNaredba(TreeNode node) {
@@ -543,12 +551,14 @@ public class ActualAnalizator {
 		} else {
 			izraz(node.getChildAt(0)); if (error) return;
 			node.setType(node.getChildAt(0).getType(scope));
+			node.setTypes(node.getChildAt(0).getTypes(scope));
+			node.setName(node.getChildAt(0).getName());
 		}
 	}
 	
 	private void naredbaGrananja(TreeNode node) {
 		izraz(node.getChildAt(2)); if (error) return;
-		if (!isCastable(node.getChildAt(2).getType(scope), "int")) {
+		if (!isCastable(node.getChildAt(2).getType(scope), "int") || node.getChildAt(2).isFunction()) {
 			printErrorMessage(node);
 			return;
 		}
@@ -562,29 +572,32 @@ public class ActualAnalizator {
 	private void naredbaPetlje(TreeNode node) {
 		if (node.getChildren().size() == 5) {
 			izraz(node.getChildAt(2)); if (error) return;
-			if (!isCastable(node.getChildAt(2).getType(scope), "int")) {
+			if (!isCastable(node.getChildAt(2).getType(scope), "int") || node.getChildAt(2).isFunction()) {
 				printErrorMessage(node);
 				return;
 			}
+			node.getChildAt(4).setLoop();
 			naredba(node.getChildAt(4)); if (error) return;
 		}
 		if (node.getChildren().size() == 6) {
 			izrazNaredba(node.getChildAt(2)); if (error) return;
 			izrazNaredba(node.getChildAt(3)); if (error) return;
-			if (!isCastable(node.getChildAt(3).getType(scope), "int")) {
+			if (!isCastable(node.getChildAt(3).getType(scope), "int") || node.getChildAt(3).isFunction()) {
 				printErrorMessage(node);
 				return;
 			}
+			node.getChildAt(5).setLoop();
 			naredba(node.getChildAt(5)); if (error) return;
 		}
 		if (node.getChildren().size() == 7) {
 			izrazNaredba(node.getChildAt(2)); if (error) return;
 			izrazNaredba(node.getChildAt(3)); if (error) return;
-			if (!isCastable(node.getChildAt(3).getType(scope), "int")) {
+			if (!isCastable(node.getChildAt(3).getType(scope), "int") || node.getChildAt(3).isFunction()) {
 				printErrorMessage(node);
 				return;
 			}
 			izraz(node.getChildAt(4)); if (error) return;
+			node.getChildAt(6).setLoop();
 			naredba(node.getChildAt(6)); if (error) return;
 		}
 	}
@@ -605,7 +618,14 @@ public class ActualAnalizator {
 					printErrorMessage(node);
 					return;
 				}
-			} 
+			} else {
+				if (!scope.isInLoop()) {
+					printErrorMessage(node);
+					return;
+				}
+	//			System.out.println("local scope: ");
+	//			for (TreeNode decl : scope.getDeclaredStuff()) System.out.println(decl.getName());
+			}
 		}
 	}
 	
@@ -728,8 +748,13 @@ public class ActualAnalizator {
 	
 	private void listaDeklaracija(TreeNode node) {
 		if (node.getChildren().size() == 1) {
+			if (node.isInLoop()) node.getChildAt(0).setLoop();
 			deklaracija(node.getChildAt(0));
 		} else {
+			if (node.isInLoop()) {
+				node.getChildAt(0).setLoop();
+				node.getChildAt(1).setLoop();
+			}
 			listaDeklaracija(node.getChildAt(0));
 			deklaracija(node.getChildAt(1));
 		}
@@ -738,18 +763,27 @@ public class ActualAnalizator {
 	private void deklaracija(TreeNode node) {
 		imeTipa(node.getChildAt(0)); if (error) return;
 		node.getChildAt(1).setType(node.getChildAt(0).getType(scope));
+	//	System.out.println(node.getChildAt(0).isConst());
+		if (node.getChildAt(0).isConst()) node.getChildAt(1).setConst();
+		if (node.isInLoop()) node.getChildAt(1).setLoop();
 		listaInitDeklaratora(node.getChildAt(1));
 	}
 	
 	private void listaInitDeklaratora(TreeNode node) {
 		if (node.getChildren().size() == 1) {
 			node.getChildAt(0).setType(node.getType(scope));
+			if(node.isConst()) node.getChildAt(0).setConst();
+			if (node.isInLoop()) node.getChildAt(0).setLoop();
 			initDeklarator(node.getChildAt(0)); if (error) return;
 		} else {
 			node.getChildAt(0).setType(node.getType(scope));
+			if (node.isInLoop()) node.getChildAt(0).setLoop();
+			if (node.isConst()) node.getChildAt(0).setConst();
 			listaInitDeklaratora(node.getChildAt(0)); if (error) return;
 			
 			node.getChildAt(2).setType(node.getType(scope));
+			if (node.isInLoop()) node.getChildAt(2).setLoop();
+			if(node.isConst()) node.getChildAt(2).setConst();
 			initDeklarator(node.getChildAt(2)); if (error) return;
 		}
 	}
@@ -757,6 +791,8 @@ public class ActualAnalizator {
 	
 	private void initDeklarator(TreeNode node) {
 		node.getChildAt(0).setType(node.getType(scope));
+		if (node.isConst()) node.getChildAt(0).setConst();
+		if (node.isInLoop()) node.getChildAt(0).setLoop();
 		izravniDeklarator(node.getChildAt(0)); if (error) return;
 		if (node.getChildren().size() == 1) {
 			if (node.getChildAt(0).isConst()) {
@@ -766,9 +802,10 @@ public class ActualAnalizator {
 		} else {
 			inicijalizator(node.getChildAt(2)); if (error) return;
 			if (node.getChildAt(0).isArray()) {
-				if (node.getChildAt(0).getArraySize() < node.getChildAt(2).getArraySize()) error = true;
+				if (node.getChildAt(0).getArraySize() <= node.getChildAt(2).getArraySize()) error = true;
 				for (String type1 : node.getChildAt(2).getTypes(scope)) {
-					if (!isCastable(type1, node.getChildAt(0).getType(scope))) error = true;
+					//System.out.println(type1);
+					if (!isCastable(type1, node.getChildAt(0).getType(scope).substring(3))) error = true;
 				}
 				if (error) {
 					printErrorMessage(node);
@@ -1055,7 +1092,7 @@ public class ActualAnalizator {
 	//	for (String def : definedFunctions) System.out.println(def);
 	//	System.out.println("declared");
 	//	for (String dec : declaredFunctions) System.out.println(dec);
-		return !definedFunctions.containsAll(declaredFunctions);
+		return !definedFunctions.containsAll(declaredFunctions) || true;
 		
 	}
 	
