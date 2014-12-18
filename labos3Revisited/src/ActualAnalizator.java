@@ -334,6 +334,8 @@ public class ActualAnalizator {
 		if (node.getChildren().size() == 1) {
 			jednakosniIzraz(node.getChildAt(0)); if (error) return;
 			node.setType(node.getChildAt(0).getType(scope));
+			node.setTypes(node.getChildAt(0).getTypes(scope));
+			node.setName(node.getChildAt(0).getName());
 			node.setLValue(node.getChildAt(0).getLValue(scope));
 		} else {
 			binIIzraz(node.getChildAt(0)); if (error) return;
@@ -355,6 +357,8 @@ public class ActualAnalizator {
 		if (node.getChildren().size() == 1) {
 			binIIzraz(node.getChildAt(0)); if (error) return;
 			node.setType(node.getChildAt(0).getType(scope));
+			node.setTypes(node.getChildAt(0).getTypes(scope));
+			node.setName(node.getChildAt(0).getName());
 			node.setLValue(node.getChildAt(0).getLValue(scope));
 		} else {
 			binXiliIzraz(node.getChildAt(0)); if (error) return;
@@ -376,6 +380,8 @@ public class ActualAnalizator {
 		if (node.getChildren().size() == 1) {
 			binXiliIzraz(node.getChildAt(0)); if (error) return;
 			node.setType(node.getChildAt(0).getType(scope));
+			node.setTypes(node.getChildAt(0).getTypes(scope));
+			node.setName(node.getChildAt(0).getName());
 			node.setLValue(node.getChildAt(0).getLValue(scope));
 		} else {
 			binIliIzraz(node.getChildAt(0)); if (error) return;
@@ -397,6 +403,8 @@ public class ActualAnalizator {
 		if (node.getChildren().size() == 1) {
 			binIliIzraz(node.getChildAt(0)); if (error) return;
 			node.setType(node.getChildAt(0).getType(scope));
+			node.setTypes(node.getChildAt(0).getTypes(scope));
+			node.setName(node.getChildAt(0).getName());
 			node.setLValue(node.getChildAt(0).getLValue(scope));
 		} else {
 			logIIzraz(node.getChildAt(0)); if (error) return;
@@ -418,6 +426,8 @@ public class ActualAnalizator {
 		if (node.getChildren().size() == 1) {
 			logIIzraz(node.getChildAt(0)); if (error) return;
 			node.setType(node.getChildAt(0).getType(scope));
+			node.setTypes(node.getChildAt(0).getTypes(scope));
+			node.setName(node.getChildAt(0).getName());
 			node.setLValue(node.getChildAt(0).getLValue(scope));
 		} else {
 			logIliIzraz(node.getChildAt(0)); if (error) return;
@@ -439,6 +449,8 @@ public class ActualAnalizator {
 		if (node.getChildren().size() == 1) {
 			logIliIzraz(node.getChildAt(0)); if (error) return;
 			node.setType(node.getChildAt(0).getType(scope));
+			node.setTypes(node.getChildAt(0).getTypes(scope));
+			node.setName(node.getChildAt(0).getName());
 			node.setLValue(node.getChildAt(0).getLValue(scope));
 		} else {
 			postfiksIzraz(node.getChildAt(0)); if (error) return;
@@ -460,6 +472,8 @@ public class ActualAnalizator {
 		if (node.getChildren().size() == 1) {
 			izrazPridruzivanja(node.getChildAt(0)); if (error) return;
 			node.setType(node.getChildAt(0).getType(scope));
+			node.setTypes(node.getChildAt(0).getTypes(scope));
+			node.setName(node.getChildAt(0).getName());
 			node.setLValue(node.getChildAt(0).getLValue(scope));
 		} else {
 			izraz(node.getChildAt(0)); if (error) return;
@@ -580,7 +594,7 @@ public class ActualAnalizator {
 		if (node.getChildren().size() == 3) {
 			izraz(node.getChildAt(1)); if (error) return;
 			String type = getTypeOfCurrentFunction();
-			if (!isCastable(node.getChildAt(1).getType(scope), type)) {
+			if (!isCastable(node.getChildAt(1).getType(scope), type) || node.getChildAt(1).isFunction()) {
 				printErrorMessage(node);
 				return;
 			}
@@ -709,7 +723,7 @@ public class ActualAnalizator {
 			node.setType("niz" + node.getChildAt(0).getType(scope));
 		}
 		node.setName(node.getChildAt(1).getName());
-		scope.addChild(node);
+	//	scope.addChild(node);
 	}
 	
 	private void listaDeklaracija(TreeNode node) {
@@ -761,7 +775,8 @@ public class ActualAnalizator {
 					return;
 				}
 			} else {
-				if (!isCastable(node.getChildAt(2).getType(scope), node.getType(scope))) {
+				if (!isCastable(node.getChildAt(2).getType(scope), node.getChildAt(0).getType(scope))
+						|| node.getChildAt(2).isFunction()) {
 					printErrorMessage(node);
 					return;
 				}
@@ -814,7 +829,7 @@ public class ActualAnalizator {
 		if (node.getChildAt(2).getContent().equals("<lista_parametara>")) {
 			listaParametara(node.getChildAt(2)); if (error) return;
 			TreeNode localDec = getLocalDeclaration(node.getChildAt(0).getName());
-			if (localDec == null) {
+			if (localDec != null) {
 				if (!checkTypes(localDec, node.getChildAt(2))) {
 					printErrorMessage(node);
 					return;
@@ -839,11 +854,14 @@ public class ActualAnalizator {
 				for (int i = 0; i < node.getArraySize(); ++i) node.addType("char");
 			} else {
 				node.setType(node.getChildAt(0).getType(scope));
+				node.setTypes(node.getChildAt(0).getTypes(scope));
 			}
+			node.setName(node.getChildAt(0).getName());
 		} else {
 			listaIzrazaPridruzivanja(node.getChildAt(1)); if (error) return;
 			node.setArraySize(node.getChildAt(1).getArraySize());
 			node.setTypes(node.getChildAt(1).getTypes(scope));
+			node.setName(node.getChildAt(1).getName());
 		}
 	}
 	
@@ -892,7 +910,7 @@ public class ActualAnalizator {
 	}
 	
 	private TreeNode getLocalDeclaration(String name) {
-		for (TreeNode declaration : scope.getDeclaredStuff()) {
+ 		for (TreeNode declaration : scope.getDeclaredStuff()) {
 			if (declaration.getName().equals(name)) return declaration;
 		}
 		return null;
@@ -1033,10 +1051,10 @@ public class ActualAnalizator {
 	}
 	
 	public boolean functionError() {
-		//System.out.println("defined: ");
-		//for (String def : definedFunctions) System.out.println(def);
-		//System.out.println("declared");
-		//for (String dec : declaredFunctions) System.out.println(dec);
+	//	System.out.println("defined: ");
+	//	for (String def : definedFunctions) System.out.println(def);
+	//	System.out.println("declared");
+	//	for (String dec : declaredFunctions) System.out.println(dec);
 		return !definedFunctions.containsAll(declaredFunctions);
 		
 	}
