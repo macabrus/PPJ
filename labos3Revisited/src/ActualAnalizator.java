@@ -1,4 +1,3 @@
-import java.io.ObjectInputStream.GetField;
 import java.math.BigInteger;
 import java.util.ArrayList;
 
@@ -52,7 +51,6 @@ public class ActualAnalizator {
 			node.setLValue(init.getLValue(scope));
 		}
 		if (init.getContent().startsWith("BROJ")) {
-			boolean inRange = false;
 			if (!isInt(node.getChildAt(0).getName())) {
 				printErrorMessage(node);
 				return;
@@ -603,7 +601,7 @@ public class ActualAnalizator {
 	}
 	
 	private void naredbaSkoka(TreeNode node) {
-		// TODO izgleda malo sjebano, zasad pretpostavlja da sve provjere prolaze
+		// TODO izgleda malo cudno, zasad pretpostavlja da sve provjere prolaze
 		if (node.getChildren().size() == 3) {
 			izraz(node.getChildAt(1)); if (error) return;
 			String type = getTypeOfCurrentFunction();
@@ -1064,20 +1062,20 @@ public class ActualAnalizator {
 		return "";
 	}
 	
-	private ArrayList<String> getTypesOfCurrentFunction() {
-		TableNode node = new TableNode();
-		node = scope;
-		while (node != null) {
-			for (int i = node.getDeclaredStuff().size() - 1; i >= 0; --i) {
-				TreeNode declaration = node.getDeclaredStuff().get(i);
-				if (declaration.isFunction() && declaration.isFunctionDefined()) {
-					return declaration.getTypes(scope);
-				}
-			}
-			node = node.getParent();
-		}
-		return new ArrayList<String>();	
-	}
+//	private ArrayList<String> getTypesOfCurrentFunction() {
+//		TableNode node = new TableNode();
+//		node = scope;
+//		while (node != null) {
+//			for (int i = node.getDeclaredStuff().size() - 1; i >= 0; --i) {
+//				TreeNode declaration = node.getDeclaredStuff().get(i);
+//				if (declaration.isFunction() && declaration.isFunctionDefined()) {
+//					return declaration.getTypes(scope);
+//				}
+//			}
+//			node = node.getParent();
+//		}
+//		return new ArrayList<String>();	
+//	}
 	
 	public boolean gotError() {
 		return error;
