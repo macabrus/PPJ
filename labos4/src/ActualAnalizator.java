@@ -18,6 +18,9 @@ public class ActualAnalizator {
 	private ArrayList<String> declaredFunctions;
 	private ArrayList<String> definedFunctions;
 	
+	private int labelCounter;
+	private ArrayList<LabelTableNode> labelTable;
+	
 	/**
 	 * Constructs class from root of generative tree
 	 * @param root Root of generative tree
@@ -27,6 +30,7 @@ public class ActualAnalizator {
 		scope = new TableNode();
 		declaredFunctions = new ArrayList<String>();
 		definedFunctions = new ArrayList<String>();
+		this.labelCounter = 0;
 	}
 	
 	public void analyze() {
@@ -58,6 +62,15 @@ public class ActualAnalizator {
 			node.setType("int");
 		//	node.setName(init.getName());
 			node.setLValue(false);
+			
+			init.setLabela("L"+ labelCounter);
+			++labelCounter;
+			
+			// dodaj labelu i DW int u globalnu tablicu
+			labelTable.add(new LabelTableNode(init.getLabela(), init));
+			
+			node.appendKod("\tLOAD R0, (" + init.getLabela() + ")\n");
+			node.appendKod("\tPUSH R0\n");
 		}
 		if (init.getContent().startsWith("ZNAK")) {
 			if (!isChar(node.getChildAt(0).getName())) {
@@ -104,6 +117,8 @@ public class ActualAnalizator {
 			node.setTypes(node.getChildAt(0).getTypes(scope));
 			node.setName(node.getChildAt(0).getName());
 			node.setLValue(node.getChildAt(0).getLValue(scope));
+			
+			node.setKod(node.getChildAt(0).getKod());
 			return;
 		}
 		if (node.getChildAt(1).getContent().startsWith("L_UGL_ZAGRADA")) {
