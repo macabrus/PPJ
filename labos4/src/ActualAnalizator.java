@@ -280,6 +280,8 @@ public class ActualAnalizator {
 	}
 
 	private void imeTipa(TreeNode node) {
+		
+		//evo ti komentar
 		if (node.getChildren().size() == 1) {
 			specifikatorTipa(node.getChildAt(0));
 			node.setType(node.getChildAt(0).getType(scope));
