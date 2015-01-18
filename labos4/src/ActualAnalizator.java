@@ -1,5 +1,7 @@
 import java.math.BigInteger;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * The class that actually analyzes (?)
@@ -19,8 +21,9 @@ public class ActualAnalizator {
 
 	private int labelCounter;
 	private int functionLabelCounter;
+	private int ifLabelCounter;
 	private int povrAdrCounter;
-	
+
 	private ArrayList<LabelTableNode> labelTable = new ArrayList<>();
 
 	public ArrayList<LabelTableNode> getLabelTable() {
@@ -38,6 +41,7 @@ public class ActualAnalizator {
 		definedFunctions = new ArrayList<String>();
 		this.labelCounter = 0;
 		this.functionLabelCounter = 0;
+		this.ifLabelCounter = 0;
 	}
 
 	public void analyze() {
@@ -65,12 +69,12 @@ public class ActualAnalizator {
 			node.setName(init.getName());
 			node.setLValue(init.getLValue(scope));
 
-			// staviti na stog iz adrese od [nadji identifikator u 
+			// staviti na stog iz adrese od [nadji identifikator u
 			// scopeu]
-				
+
 			TreeNode idn = getDeclaredYet(init.getName());
 			String label = idn.getLabela();
-			
+
 			if (node.isFunction()) {
 				node.appendKod("\tCALL " + label + "\n");
 				if (node.getTypes(scope).size() == 1 && !node.getTypeAt(0).equals("void"))
@@ -80,7 +84,7 @@ public class ActualAnalizator {
 				node.appendKod("\tLOAD R0, (" + label + ")\n");
 				node.appendKod("\tPUSH R0\n");
 			}
-			
+
 			node.setLabela(label);
 		}
 		if (init.getContent().startsWith("BROJ")) {
@@ -191,7 +195,7 @@ public class ActualAnalizator {
 			node.setType(node.getChildAt(0).getType(scope));
 			node.setName(node.getChildAt(0).getName());
 			node.setLValue(false);
-			
+
 			node.appendKod(node.getChildAt(0).getKod());
 		}
 		if (node.getChildren().size() == 4) {
@@ -219,10 +223,10 @@ public class ActualAnalizator {
 			}
 			node.setType(pIzraz.getType(scope));
 			node.setLValue(false);
-		
+
 			node.appendKod(node.getChildAt(2).getKod());
 			node.appendKod(node.getChildAt(0).getKod());
-			
+
 		}
 		if (node.getChildren().size() == 2) {
 			postfiksIzraz(node.getChildAt(0));
@@ -244,7 +248,7 @@ public class ActualAnalizator {
 			if (error)
 				return;
 			node.addType(node.getChildAt(0).getType(scope));
-			
+
 			node.appendKod(node.getChildAt(0).getKod());
 		} else {
 			listaArgumenata(node.getChildAt(0));
@@ -465,6 +469,39 @@ public class ActualAnalizator {
 			}
 			node.setType("int");
 			node.setLValue(false);
+
+			node.appendKod(node.getChildAt(0).getKod());
+			node.appendKod(node.getChildAt(2).getKod());
+
+			node.appendKod("\tPOP R1\n");
+			node.appendKod("\tPOP R0\n");
+			node.appendKod("\tCMP R0, R1\n");
+
+			HashMap<String, String> mapa = new HashMap<String, String>();
+			mapa.put("<", "SLT");
+			mapa.put(">", "SGT");
+			mapa.put("<=", "SLE");
+			mapa.put(">=", "SGE");
+
+			String labelaTrue = "TRUE" + ifLabelCounter;
+			String labelaFalse = "FALSE" + ifLabelCounter;
+			String labelaEndIf = "FALSE" + ifLabelCounter++;
+
+			// dodaj JP TRUE
+			node.appendKod("\tJP_" + mapa.get(node.getChildAt(1).getName()) + " " + labelaTrue + "\n");
+			// slijedi false kod
+			node.appendKod(labelaFalse + "\n");
+			node.appendKod("\tMOVE 0, R2\n");
+			node.appendKod("\tJP " + labelaEndIf + "\n");
+
+			// slijedi true kod
+			node.appendKod(labelaTrue + "\n");
+			node.appendKod("\tMOVE 1, R2\n");
+
+			// slijedi endif
+			node.appendKod(labelaEndIf + "\n");
+			node.appendKod("\tPUSH R2\n");
+
 		}
 	}
 
@@ -564,7 +601,7 @@ public class ActualAnalizator {
 			}
 			node.setType("int");
 			node.setLValue(false);
-			
+
 			node.appendKod(node.getChildAt(0).getKod());
 			node.appendKod(node.getChildAt(2).getKod());
 			node.appendKod("\tPOP R0\n\tPOP R1\n");
@@ -761,7 +798,7 @@ public class ActualAnalizator {
 		}
 
 		int offset = 4;
-		for (String n : node.getNames()){
+		for (String n : node.getNames()) {
 			node.appendKod("\tLOAD R0, (R7+" + offset + ")\n");
 			String labela = "L" + labelCounter++;
 			node.appendKod("\tSTORE R0, (" + labela + ")\n");
@@ -771,7 +808,7 @@ public class ActualAnalizator {
 			ltnode.setEmpty(true);
 			labelTable.add(ltnode);
 		}
-		
+
 		// gadna brija neka
 
 		if (node.getChildren().size() == 3) {
@@ -809,6 +846,9 @@ public class ActualAnalizator {
 			naredba(node.getChildAt(1));
 			if (error)
 				return;
+
+			node.appendKod(node.getChildAt(0).getKod());
+			node.appendKod(node.getChildAt(1).getKod());
 		}
 	}
 
@@ -862,6 +902,29 @@ public class ActualAnalizator {
 			if (error)
 				return;
 		}
+
+		String labelaThen = "THEN" + ifLabelCounter;
+		String labelaElse = "ELSE" + ifLabelCounter;
+		String labelaEndIf = "ENDIF" + ifLabelCounter++;
+
+		node.appendKod(node.getChildAt(2).getKod());
+		node.appendKod("\tPOP R0\n");
+		node.appendKod("\tCMP R0, 0\n");
+
+		node.appendKod("\tJP_EQ " + labelaElse + "\n");
+		node.appendKod(labelaThen + "\n");
+
+		node.appendKod(node.getChildAt(4).getKod());
+		node.appendKod("\tJP " + labelaEndIf + "\n");
+
+		node.appendKod("\tJP_NE " + labelaElse + "\n");
+		node.appendKod(labelaElse + "\n");
+
+		if (node.getChildren().size() == 7) {
+			node.appendKod(node.getChildAt(6).getKod());
+		}
+
+		node.appendKod(labelaEndIf + "\n");
 	}
 
 	private void naredbaPetlje(TreeNode node) {
@@ -1020,10 +1083,10 @@ public class ActualAnalizator {
 				node.setLabela("F" + functionLabelCounter);
 				++functionLabelCounter;
 			}
-		
+
 			node.appendKod(node.getLabela());
 			node.appendKod(node.getChildAt(5).getKod());
-			
+
 			LabelTableNode ltnode = new LabelTableNode(node.getLabela(), node);
 			ltnode.setFunction(true);
 			// dodaj labelu u globalnu tablicu
@@ -1051,26 +1114,26 @@ public class ActualAnalizator {
 			 * System.out.println("Names: "); for (String name :
 			 * node.getChildAt(5).getNames()) System.out.println(name);
 			 */
-			
+
 			if (node.getChildAt(1).getName().equals("main")) {
 				node.setLabela("MAIN");
 			} else {
 				node.setLabela("F" + functionLabelCounter);
 				++functionLabelCounter;
 			}
-		
+
 			node.appendKod(node.getLabela());
-		
+
 			definedFunctions.add(node.getName());
 			scope.addChild(node);
 			slozenaNaredba(node.getChildAt(5));
 			if (error)
 				return;
-			
+
 			node.appendKod(node.getChildAt(5).getKod());
-			
+
 			LabelTableNode ltnode = new LabelTableNode(node.getLabela(), node);
-			ltnode.setFunction(true	);
+			ltnode.setFunction(true);
 			// dodaj labelu u globalnu tablicu
 			labelTable.add(ltnode);
 		}
@@ -1121,7 +1184,7 @@ public class ActualAnalizator {
 			node.setType("niz" + node.getChildAt(0).getType(scope));
 		}
 		node.setName(node.getChildAt(1).getName());
-		 // scope.addChild(node);
+		// scope.addChild(node);
 	}
 
 	private void listaDeklaracija(TreeNode node) {
