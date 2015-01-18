@@ -47,6 +47,10 @@ public class TableNode {
 		declaredStuff.add(node);
 	}
 	
+	public TreeNode getChildAt(int i) {
+		return declaredStuff.get(i);
+	}
+	
 	public void setLoop() {
 		inLoop = true;
 	}

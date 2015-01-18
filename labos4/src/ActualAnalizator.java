@@ -158,6 +158,7 @@ public class ActualAnalizator {
 			node.setLValue(node.getChildAt(0).getLValue(scope));
 
 			node.appendKod(node.getChildAt(0).getKod());
+			node.setLabela(node.getChildAt(0).getLabela());
 			return;
 		}
 		if (node.getChildAt(1).getContent().startsWith("L_UGL_ZAGRADA")) {
@@ -182,7 +183,20 @@ public class ActualAnalizator {
 			}
 			node.setType(X);
 			node.setLValue(!isConst);
+
+			String labela = getDeclaredYet(node.getChildAt(0).getName()).getLabela();
+			node.appendKod(node.getChildAt(2).getKod());
+
+			node.appendKod("\tPOP R0\n");
+			node.appendKod("\tSHL R0, %D 2, R0\n");
+			
+			node.appendKod("\tMOVE " + labela + ", R1\n");
+			node.appendKod("\tADD R0, R1, R0\n");
+			
+			node.appendKod("\tLOAD R0, (R0)\n\tPUSH R0\n");
+			
 			return;
+			
 		}
 		if (node.getChildren().size() == 3) {
 			postfiksIzraz(node.getChildAt(0));
@@ -273,6 +287,8 @@ public class ActualAnalizator {
 			node.setLValue(node.getChildAt(0).getLValue(scope));
 
 			node.appendKod(node.getChildAt(0).getKod());
+			node.setLabela(node.getChildAt(0).getLabela());
+			
 		} else if (node.getChildAt(1).getContent().equals("<unarni_izraz>")) {
 			unarniIzraz(node.getChildAt(1));
 			if (error)
@@ -296,15 +312,15 @@ public class ActualAnalizator {
 
 			// MIJENJAM
 			node.appendKod(node.getChildAt(1).getKod());
-			// String labela = node.getChildAt(1).getLabela(); NE NADJE LABELU
-			// JER NIJE PROPAGIRANA
-			// System.out.println("BBB" + node.getChildAt(1).getKod() +
-			// "ADASDADA");
-			// node.appendKod("\tLOAD R0, (" + labela + ")\n");
-			// node.appendKod("\tXOR R0, -1, RO\n\tADD R0, 1, R0\n");
-			// node.appendKod("\tSTORE R0, (" + labela + ")\n");
 			node.appendKod("\tPOP R0\n");
-			node.appendKod("\tXOR R0, -1, R0\n\tADD R0, 1, R0\n");
+			//System.out.println(node.getChildAt(0).getChildAt(0).getName());
+			if (node.getChildAt(0).getChildAt(0).getName().equals("-")) {
+				node.appendKod("\tXOR R0, -1, R0\n\tADD R0, 1, R0\n");
+			}
+			if (node.getChildAt(0).getChildAt(0).getName().equals("~")) {
+				node.appendKod("\tXOR R0, %D -1, R0\n");
+			}
+			
 			node.appendKod("\tPUSH R0\n");
 		}
 	}
@@ -320,6 +336,8 @@ public class ActualAnalizator {
 			node.setLValue(node.getChildAt(0).getLValue(scope));
 
 			node.appendKod(node.getChildAt(0).getKod());
+			node.setLabela(node.getChildAt(0).getLabela());
+			
 		} else {
 			imeTipa(node.getChildAt(1));
 			if (error)
@@ -335,6 +353,9 @@ public class ActualAnalizator {
 			}
 			node.setType(node.getChildAt(1).getType(scope));
 			node.setLValue(false);
+			
+			node.appendKod(node.getChildAt(3).getKod());
+			node.setLabela(node.getChildAt(3).getLabela());
 		}
 	}
 
@@ -376,6 +397,8 @@ public class ActualAnalizator {
 			node.setLValue(node.getChildAt(0).getLValue(scope));
 
 			node.appendKod(node.getChildAt(0).getKod());
+			node.setLabela(node.getChildAt(0).getLabela());
+			
 		} else {
 			multiplikativniIzraz(node.getChildAt(0));
 			if (error)
@@ -407,6 +430,8 @@ public class ActualAnalizator {
 			node.setLValue(node.getChildAt(0).getLValue(scope));
 
 			node.appendKod(node.getChildAt(0).getKod());
+			node.setLabela(node.getChildAt(0).getLabela());
+			
 		} else {
 			aditivniIzraz(node.getChildAt(0));
 			if (error)
@@ -452,6 +477,8 @@ public class ActualAnalizator {
 			node.setLValue(node.getChildAt(0).getLValue(scope));
 
 			node.appendKod(node.getChildAt(0).getKod());
+			node.setLabela(node.getChildAt(0).getLabela());
+			
 		} else {
 			odnosniIzraz(node.getChildAt(0));
 			if (error)
@@ -485,7 +512,7 @@ public class ActualAnalizator {
 
 			String labelaTrue = "TRUE" + ifLabelCounter;
 			String labelaFalse = "FALSE" + ifLabelCounter;
-			String labelaEndIf = "FALSE" + ifLabelCounter++;
+			String labelaEndIf = "ENDIF" + ifLabelCounter++;
 
 			// dodaj JP TRUE
 			node.appendKod("\tJP_" + mapa.get(node.getChildAt(1).getName()) + " " + labelaTrue + "\n");
@@ -516,6 +543,8 @@ public class ActualAnalizator {
 			node.setLValue(node.getChildAt(0).getLValue(scope));
 
 			node.appendKod(node.getChildAt(0).getKod());
+			node.setLabela(node.getChildAt(0).getLabela());
+			
 		} else {
 			jednakosniIzraz(node.getChildAt(0));
 			if (error)
@@ -547,6 +576,8 @@ public class ActualAnalizator {
 			node.setLValue(node.getChildAt(0).getLValue(scope));
 
 			node.appendKod(node.getChildAt(0).getKod());
+			node.setLabela(node.getChildAt(0).getLabela());
+			
 		} else {
 			binIIzraz(node.getChildAt(0));
 			if (error)
@@ -584,6 +615,8 @@ public class ActualAnalizator {
 			node.setLValue(node.getChildAt(0).getLValue(scope));
 
 			node.appendKod(node.getChildAt(0).getKod());
+			node.setLabela(node.getChildAt(0).getLabela());
+			
 		} else {
 			binXiliIzraz(node.getChildAt(0));
 			if (error)
@@ -621,6 +654,8 @@ public class ActualAnalizator {
 			node.setLValue(node.getChildAt(0).getLValue(scope));
 
 			node.appendKod(node.getChildAt(0).getKod());
+			node.setLabela(node.getChildAt(0).getLabela());
+			
 		} else {
 			binIliIzraz(node.getChildAt(0));
 			if (error)
@@ -658,6 +693,8 @@ public class ActualAnalizator {
 			node.setLValue(node.getChildAt(0).getLValue(scope));
 
 			node.appendKod(node.getChildAt(0).getKod());
+			node.setLabela(node.getChildAt(0).getLabela());
+			
 		} else {
 			logIIzraz(node.getChildAt(0));
 			if (error)
@@ -689,6 +726,8 @@ public class ActualAnalizator {
 			node.setLValue(node.getChildAt(0).getLValue(scope));
 
 			node.appendKod(node.getChildAt(0).getKod());
+			node.setLabela(node.getChildAt(0).getLabela());
+			
 		} else {
 			logIliIzraz(node.getChildAt(0));
 			if (error)
@@ -720,6 +759,8 @@ public class ActualAnalizator {
 			node.setLValue(node.getChildAt(0).getLValue(scope));
 
 			node.appendKod(node.getChildAt(0).getKod());
+			node.setLabela(node.getChildAt(0).getLabela());
+			
 		} else {
 			postfiksIzraz(node.getChildAt(0));
 			if (error)
@@ -737,6 +778,8 @@ public class ActualAnalizator {
 			}
 			node.setType(node.getChildAt(0).getType(scope));
 			node.setLValue(false);
+			
+			
 		}
 	}
 
@@ -1242,6 +1285,8 @@ public class ActualAnalizator {
 			if (error)
 				return;
 
+			node.appendKod(node.getChildAt(0).getKod());
+			
 			node.getChildAt(2).setType(node.getType(scope));
 			if (node.isInLoop())
 				node.getChildAt(2).setLoop();
@@ -1250,6 +1295,9 @@ public class ActualAnalizator {
 			initDeklarator(node.getChildAt(2));
 			if (error)
 				return;
+			
+			node.appendKod(node.getChildAt(2).getKod());
+			
 		}
 	}
 
@@ -1260,8 +1308,9 @@ public class ActualAnalizator {
 		if (node.isInLoop())
 			node.getChildAt(0).setLoop();
 		izravniDeklarator(node.getChildAt(0));
-		if (error)
+		if (error) {
 			return;
+		}
 		if (node.getChildren().size() == 1) {
 			if (node.getChildAt(0).isConst()) {
 				printErrorMessage(node);
@@ -1270,10 +1319,10 @@ public class ActualAnalizator {
 			node.appendKod(node.getChildAt(0).getKod());
 		} else {
 			inicijalizator(node.getChildAt(2));
-			if (error)
+			if (error) 
 				return;
 			if (node.getChildAt(0).isArray()) {
-				if (node.getChildAt(0).getArraySize() <= node.getChildAt(2).getArraySize())
+				if (node.getChildAt(0).getArraySize() < node.getChildAt(2).getArraySize())
 					error = true;
 				for (String type1 : node.getChildAt(2).getTypes(scope)) {
 					// System.out.println(type1);
@@ -1284,25 +1333,32 @@ public class ActualAnalizator {
 					printErrorMessage(node);
 					return;
 				}
+			
+				node.setLabela(node.getChildAt(2).getLabela());
+				scope.getChildAt(scope.getDeclaredStuff().size() - 1).setLabela(node.getLabela());
+				//System.out.println(";" + node.getChildAt(2).getLabela());
+				//node.appendKod(node.getChildAt(2).getKod());
+				
 			} else {
 				if (!isCastable(node.getChildAt(2).getType(scope), node.getChildAt(0).getType(scope))
 						|| node.getChildAt(2).isFunction()) {
 					printErrorMessage(node);
 					return;
 				}
+			
+				node.appendKod(node.getChildAt(2).getKod());
+				String labela = node.getChildAt(0).getLabela();
+
+				node.appendKod("\tLOAD R0, (R7)\n");
+				node.appendKod("\tSTORE R0, (" + labela + ")\n");
+				node.appendKod("\tADD R7, 4, R7\n");
+				LabelTableNode ltNode = new LabelTableNode(labela, node);
+				ltNode.setEmpty(true);
+				labelTable.add(ltNode);
+
+				node.setLabela(labela);
+			
 			}
-
-			node.appendKod(node.getChildAt(2).getKod());
-			String labela = node.getChildAt(0).getLabela();
-
-			node.appendKod("\tLOAD R0, (R7)\n");
-			node.appendKod("\tSTORE R0, (" + labela + ")\n");
-			node.appendKod("\tADD R7, 4, R7\n");
-			LabelTableNode ltNode = new LabelTableNode(labela, node);
-			ltNode.setEmpty(true);
-			labelTable.add(ltNode);
-
-			node.setLabela(labela);
 		}
 	}
 
@@ -1386,6 +1442,8 @@ public class ActualAnalizator {
 			node.setName(node.getChildAt(0).getName());
 
 			node.appendKod(node.getChildAt(0).getKod());
+			node.setLabela(node.getChildAt(0).getLabela());
+			
 		} else {
 			listaIzrazaPridruzivanja(node.getChildAt(1));
 			if (error)
@@ -1393,6 +1451,10 @@ public class ActualAnalizator {
 			node.setArraySize(node.getChildAt(1).getArraySize());
 			node.setTypes(node.getChildAt(1).getTypes(scope));
 			node.setName(node.getChildAt(1).getName());
+	
+			node.appendKod(node.getChildAt(1).getKod());
+			node.setLabela(node.getChildAt(1).getLabela());
+			
 		}
 	}
 
@@ -1403,6 +1465,10 @@ public class ActualAnalizator {
 				return;
 			node.addType(node.getChildAt(0).getType(scope));
 			node.setArraySize(1);
+			
+			node.appendKod(node.getChildAt(0).getKod());
+			node.setLabela(node.getChildAt(0).getLabela());
+			
 		} else {
 			listaIzrazaPridruzivanja(node.getChildAt(0));
 			if (error)
@@ -1413,6 +1479,11 @@ public class ActualAnalizator {
 			node.setTypes(node.getChildAt(0).getTypes(scope));
 			node.addType(node.getChildAt(2).getType(scope));
 			node.setArraySize(node.getChildAt(0).getArraySize() + 1);
+		
+			node.appendKod(node.getChildAt(0).getKod());
+			node.appendKod(node.getChildAt(2).getKod());
+			node.setLabela(node.getChildAt(0).getLabela());
+			
 		}
 	}
 
