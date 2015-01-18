@@ -183,7 +183,9 @@ public class ActualAnalizator {
 			}
 			node.setType(X);
 			node.setLValue(!isConst);
-
+			node.setName(node.getChildAt(0).getName());
+			node.setTypes(node.getChildAt(0).getTypes(scope));
+			
 			String labela = getDeclaredYet(node.getChildAt(0).getName()).getLabela();
 			node.appendKod(node.getChildAt(2).getKod());
 
@@ -193,7 +195,9 @@ public class ActualAnalizator {
 			node.appendKod("\tMOVE " + labela + ", R1\n");
 			node.appendKod("\tADD R0, R1, R0\n");
 			
-			node.appendKod("\tLOAD R0, (R0)\n\tPUSH R0\n");
+			node.appendKod("\tLOAD R0, (R0)\n\tPUSH R0\n");	
+			
+			
 			
 			return;
 			
@@ -287,6 +291,8 @@ public class ActualAnalizator {
 			node.setLValue(node.getChildAt(0).getLValue(scope));
 
 			node.appendKod(node.getChildAt(0).getKod());
+			//node.appendKod("\tPOP R0\n\tLOAD R0, (R0)\n\tPUSH R0\n");
+			
 			node.setLabela(node.getChildAt(0).getLabela());
 			
 		} else if (node.getChildAt(1).getContent().equals("<unarni_izraz>")) {
@@ -779,6 +785,24 @@ public class ActualAnalizator {
 			node.setType(node.getChildAt(0).getType(scope));
 			node.setLValue(false);
 			
+			for (int i = 0; i < node.getChildAt(0).getKod().split("\n").length - 2; ++i) {
+				node.appendKod((node.getChildAt(0).getKod().split("\n"))[i] + "\n");
+			}
+			
+			node.appendKod("\tPUSH R0\n");
+			
+			//node.appendKod(node.getChildAt(0).getKod());
+			//node.appendKod("\tPOP R0\n");
+			node.appendKod(node.getChildAt(2).getKod());
+			
+			node.appendKod("\tPOP R1\n");
+			node.appendKod("\tPOP R0\n");
+			
+			node.appendKod("\tSTORE R1, (R0)\n");
+			
+			//System.out.println("mirko" + node.getChildAt(0).getName());
+			// System.out.println("mirko" + node.getChildAt(2).getName());
+			
 			
 		}
 	}
@@ -918,6 +942,7 @@ public class ActualAnalizator {
 	private void izrazNaredba(TreeNode node) {
 		if (node.getChildren().size() == 1) {
 			node.setType("int");
+			node.appendKod(node.getChildAt(0).getKod());
 		} else {
 			izraz(node.getChildAt(0));
 			if (error)
@@ -925,6 +950,7 @@ public class ActualAnalizator {
 			node.setType(node.getChildAt(0).getType(scope));
 			node.setTypes(node.getChildAt(0).getTypes(scope));
 			node.setName(node.getChildAt(0).getName());
+			node.appendKod(node.getChildAt(0).getKod());	
 		}
 	}
 
@@ -1317,6 +1343,18 @@ public class ActualAnalizator {
 				return;
 			}
 			node.appendKod(node.getChildAt(0).getKod());
+			if (node.getChildAt(0).isArray()) {
+				String labela;
+				for (int i = 0; i < node.getChildAt(0).getArraySize(); ++i) {
+					labela = "L" + labelCounter++;
+					if (i == 0) node.setLabela(labela);
+					LabelTableNode ltnode = new LabelTableNode(labela, null);
+					ltnode.setEmpty(true);
+					labelTable.add(ltnode);
+//					System.out.println(i);
+				}
+				scope.getChildAt(scope.getDeclaredStuff().size() - 1).setLabela(node.getLabela());
+			}
 		} else {
 			inicijalizator(node.getChildAt(2));
 			if (error) 
