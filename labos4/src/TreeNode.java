@@ -58,6 +58,7 @@ public class TreeNode {
 		this.depth = depth;
 		this.content = content;
 		this.children = new ArrayList<TreeNode>();
+		this.kod = "";
 	}
 
 	/**

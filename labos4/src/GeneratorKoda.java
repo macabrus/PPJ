@@ -20,21 +20,42 @@ public class GeneratorKoda {
 		rootOfGenerativeTree = parser.getRoot();
 
 		// Provjereno da radi na svim primjerima
-		rootOfGenerativeTree.printSubtree(0);
+		// rootOfGenerativeTree.printSubtree(0);
 
-		System.out.print("\n\tMOVE 40000, R7\n\tJP CMAIN\n");
-//		"\tCALL MAIN\n\tHALT\n\nMAIN\n");
-		
-		// izraz pridruzivanja:
-		System.out.print("\tLOAD R0, (BLA)\n\tPUSH R0\n");
-		
-		// return:
-		System.out.print("\tPOP R6\n\tRET\n");
-		
-		// call main medjulabela
-		
-		
-		// definiraj labele
-		System.out.print("BLA\tDW %D 12\n");
+		ActualAnalizator analizator = new ActualAnalizator(rootOfGenerativeTree);
+		analizator.analyze();
+
+		System.out.print("\tMOVE 40000, R7\n");
+		String main = "\tCALL MAIN\n\tHALT\n\n";
+
+		ArrayList<LabelTableNode> labels = analizator.getLabelTable();
+
+		boolean notTab = true;
+		for (String bla : analizator.getRoot().getKod().split("\n")) {
+			if (!bla.startsWith("\t") && notTab) {
+				System.out.print(main);
+				notTab = false;
+			}
+			System.out.print(bla + "\n");
+		}
+
+		// System.out.println(analizator.getRoot().getKod());
+		// for (LabelTableNode ltNode : labels) {
+		// if (ltNode.isFunction()) {
+		// System.out.print(ltNode.getLabela() + "\n");
+		// System.out.print(ltNode.getValue().getKod() + "\n");
+		// }
+		// }
+		//
+		for (LabelTableNode ltNode : labels) {
+			if (!ltNode.isFunction()) {
+				System.out.print(ltNode.getLabela());
+				if (ltNode.isEmpty()) {
+					System.out.print("\tDW %D 0\n");
+					continue;
+				}
+				System.out.print(ltNode.getBytes());
+			}
+		}
 	}
 }

@@ -1,14 +1,14 @@
 -----------------------------------------
 Izrazi
 -----------------------------------------
-<primarni izraz>				1/5		
+<primarni izraz>				4/5		
 <postfiks_izraz>				0/5
 <lista_argumenata>				0/2
 <unarni_izraz>					0/3
 <unarni_operator>				0/1
 <cast_izraz>					0/2
 <ime_tipa>						0/2
-<specifikator_tipa>				0/3
+<specifikator_tipa>				0/3	nis?
 <multiplikativni_izraz>			0/2
 <aditivni_izraz>				0/2
 <odnosni_izraz>					0/2
@@ -31,7 +31,7 @@ Naredbena struktura programa
 <naredba_petlje>				0/3      
 <naredba_skoka>					0/3
 <prijevodna_jedinica>			0/2
-<vanjska_deklaracija>			0/1
+<vanjska_deklaracija>			1/1
 -----------------------------------------
 Deklaracije i definicije
 -----------------------------------------
