@@ -264,6 +264,21 @@ public class ActualAnalizator {
 			}
 			node.setType("int");
 			node.setLValue(false);
+			
+			node.appendKod(node.getChildAt(0).getKod());
+			
+			if (node.getChildAt(1).getName().equals("++")) {
+				node.appendKod("\tPOP R0\n");
+				node.appendKod("\tADD R0, 1, R0\n");
+				node.appendKod("\tPUSH R0\n");
+			} else {
+				node.appendKod("\tPOP R0\n");
+				node.appendKod("\tSUB R0, 1, R0\n");
+				node.appendKod("\tPUSH R0\n");	
+			}
+			
+			//node.appendKod("mirko\n");
+			//node.appendKod(node.getChildAt(1).getName() + "\n");
 		}
 	}
 
