@@ -935,6 +935,7 @@ public class ActualAnalizator {
 					printErrorMessage(node);
 					return;
 				}
+				node.appendKod("\tRET\n");
 			} else {
 				if (!scope.isInLoop()) {
 					printErrorMessage(node);
@@ -1203,6 +1204,7 @@ public class ActualAnalizator {
 				printErrorMessage(node);
 				return;
 			}
+			node.appendKod(node.getChildAt(0).getKod());
 		} else {
 			inicijalizator(node.getChildAt(2));
 			if (error)

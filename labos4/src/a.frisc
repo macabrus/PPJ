@@ -3,25 +3,26 @@
 	PUSH R0
 	LOAD R0, (R7)
 	STORE R0, (L0)
+	ADD R7, 4, R7
 	LOAD R0, (L3)
 	PUSH R0
 	LOAD R0, (R7)
 	STORE R0, (L2)
+	ADD R7, 4, R7
 	CALL MAIN
 	HALT
 
-MAIN
-	LOAD R0, (L0)
+MAIN	LOAD R0, (L2)
 	PUSH R0
-	LOAD R0, (L2)
+	LOAD R0, (L0)
 	PUSH R0
 	POP R0
 	POP R1
-	XOR R0, R1, R0
+	ADD R0, R1, R0
 	PUSH R0
 	POP R6
 	RET
-L1	`DW %D 27, %D 0, %D 0, %D 0
+L1	`DW %D 2, %D 0, %D 0, %D 0
 L0	DW %D 0
-L3	`DW %D 65, %D 0, %D 0, %D 0
+L3	`DW %D 97, %D 0, %D 0, %D 0
 L2	DW %D 0

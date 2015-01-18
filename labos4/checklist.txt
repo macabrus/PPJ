@@ -1,47 +1,47 @@
 -----------------------------------------
 Izrazi
 -----------------------------------------
-<primarni izraz>				4/5		
-<postfiks_izraz>				0/5
-<lista_argumenata>				0/2
-<unarni_izraz>					0/3
-<unarni_operator>				0/1
-<cast_izraz>					0/2
-<ime_tipa>						0/2
-<specifikator_tipa>				0/3	nis?
-<multiplikativni_izraz>			0/2
-<aditivni_izraz>				0/2
-<odnosni_izraz>					0/2
-<jednakosni_izraz>				0/2
-<bin_i_izraz>					0/2
-<bin_xili_izraz>				0/2
-<bin_ili_izraz>					0/2
-<log_i_izraz>					0/2
-<log_ili_izraz>					0/2
-<izraz_pridruzivanja>			0/2
-<izraz>							0/2
+<primarni izraz>				4 / 5		
+<postfiks_izraz>				3 / 5
+<lista_argumenata>				1 / 2
+<unarni_izraz>					2 / 3
+<unarni_operator>				1 / 1	nis
+<cast_izraz>					1 / 2
+<ime_tipa>						2 / 2	nis
+<specifikator_tipa>				3 / 3	nis
+<multiplikativni_izraz>			1 / 2
+<aditivni_izraz>				2 / 2
+<odnosni_izraz>					1 / 2
+<jednakosni_izraz>				1 / 2
+<bin_i_izraz>					2 / 2
+<bin_xili_izraz>				2 / 2
+<bin_ili_izraz>					2 / 2
+<log_i_izraz>					1 / 2
+<log_ili_izraz>					1 / 2
+<izraz_pridruzivanja>			1 / 2
+<izraz>							1 / 2
 -----------------------------------------
 Naredbena struktura programa
 -----------------------------------------
-<slozena_naredba>				0/2
-<lista_naredbi>					0/2
-<naredba>						0/1
-<izraz_naredba>					0/2      
-<naredba_grananja>				0/2       
-<naredba_petlje>				0/3      
-<naredba_skoka>					0/3
-<prijevodna_jedinica>			0/2
-<vanjska_deklaracija>			1/1
+<slozena_naredba>				2 / 2
+<lista_naredbi>					0 / 2
+<naredba>						1 / 1
+<izraz_naredba>					0 / 2      
+<naredba_grananja>				0 / 2       
+<naredba_petlje>				0 / 3      
+<naredba_skoka>					2 / 3
+<prijevodna_jedinica>			2 / 2
+<vanjska_deklaracija>			1 / 1
 -----------------------------------------
 Deklaracije i definicije
 -----------------------------------------
-<definicija_funkcije>			0/2
-<lista_parametara>				0/2      
-<deklaracija_parametra>			0/2      
-<lista_deklaracija>				0/2      
-<deklaracija>					0/1      
-<lista_init_deklaratora>		0/2      
-<init_deklarator>				0/2      
-<izravni_deklarator>			0/4      
-<inicijalizator>			    0/2      
-<lista_izraza_pridruzivanja>	0/2      
+<definicija_funkcije>			0 / 2
+<lista_parametara>				0 / 2      
+<deklaracija_parametra>			0 / 2      
+<lista_deklaracija>				2 / 2      
+<deklaracija>					1 / 1      
+<lista_init_deklaratora>		1 / 2      
+<init_deklarator>				2 / 2      
+<izravni_deklarator>			0 / 4      
+<inicijalizator>			    0 / 2      
+<lista_izraza_pridruzivanja>	0 / 2      

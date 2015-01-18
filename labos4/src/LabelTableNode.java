@@ -47,7 +47,12 @@ public class LabelTableNode {
 
 	public String getBytes() {
 		String sol = "\t`DW ";
-		int broj = Integer.parseInt(this.value.getName());
+		int broj;
+		if (this.value.getName().startsWith("'")) {
+			broj = (int) this.value.getName().charAt(1);
+		} else {
+			broj = Integer.parseInt(this.value.getName());
+		}
 		int mask = (1 << 8) - 1;
 		for (int i = 0; i < 4; i++) {
 			sol += "%D " + (broj & mask) + ", ";
