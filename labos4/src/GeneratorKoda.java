@@ -1,6 +1,7 @@
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.io.PrintWriter;
 import java.util.ArrayList;
 
 public class GeneratorKoda {
@@ -25,8 +26,10 @@ public class GeneratorKoda {
 		ActualAnalizator analizator = new ActualAnalizator(rootOfGenerativeTree);
 		analizator.analyze();
 
-		System.out.print("\t`BASE D\n");
-		System.out.print("\tMOVE 40000, R7\n");
+		PrintWriter writer = new PrintWriter("a.frisc", "UTF-8");
+
+		writer.print("\t`BASE D\n");
+		writer.print("\tMOVE 40000, R7\n");
 		String main = "\tCALL MAIN\n\tHALT\n\n";
 
 		ArrayList<LabelTableNode> labels = analizator.getLabelTable();
@@ -34,10 +37,10 @@ public class GeneratorKoda {
 		boolean notTab = true;
 		for (String bla : analizator.getRoot().getKod().split("\n")) {
 			if (!bla.startsWith("\t") && notTab) {
-				System.out.print(main);
+				writer.print(main);
 				notTab = false;
 			}
-			System.out.print(bla + "\n");
+			writer.print(bla + "\n");
 		}
 
 		// System.out.println(analizator.getRoot().getKod());
@@ -50,14 +53,16 @@ public class GeneratorKoda {
 		//
 		for (LabelTableNode ltNode : labels) {
 			if (!ltNode.isFunction()) {
-				System.out.print(ltNode.getLabela());
+				writer.print(ltNode.getLabela());
 				if (ltNode.isEmpty()) {
-					//System.out.print("\n");
-					System.out.print("\tDW %D 0\n");
+					// System.out.print("\n");
+					writer.print("\tDW %D 0\n");
 					continue;
 				}
-				System.out.print(ltNode.getBytes());
+				writer.print(ltNode.getBytes());
 			}
 		}
+
+		writer.close();
 	}
 }
