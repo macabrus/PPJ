@@ -51,6 +51,7 @@ public class GeneratorKoda {
 			if (!ltNode.isFunction()) {
 				System.out.print(ltNode.getLabela());
 				if (ltNode.isEmpty()) {
+					//System.out.print("\n");
 					System.out.print("\tDW %D 0\n");
 					continue;
 				}
