@@ -25,6 +25,7 @@ public class GeneratorKoda {
 		ActualAnalizator analizator = new ActualAnalizator(rootOfGenerativeTree);
 		analizator.analyze();
 
+		System.out.print("\t`BASE D\n");
 		System.out.print("\tMOVE 40000, R7\n");
 		String main = "\tCALL MAIN\n\tHALT\n\n";
 

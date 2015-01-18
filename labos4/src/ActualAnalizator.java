@@ -75,16 +75,23 @@ public class ActualAnalizator {
 			TreeNode idn = getDeclaredYet(init.getName());
 			String label = idn.getLabela();
 
+	//		System.out.println(idn.isArray() + "  " + node.isArray());
+			
 			if (node.isFunction()) {
 				node.appendKod("\tCALL " + label + "\n");
-				if (node.getTypes(scope).size() == 1 && !node.getTypeAt(0).equals("void"))
-					node.appendKod("\tADD R7, " + node.getTypes(scope).size() * 4 + ", R7\n");
-				node.appendKod("\tPUSH R6\n");
+				if (node.getTypes(scope).size() != 1 || (node.getTypes(scope).size() == 1 && !node.getTypeAt(0).equals("void")))
+					node.appendKod("\tADD R7, %D " + node.getTypes(scope).size() * 4 + ", R7\n");
+				if (!node.getType(scope).equals("void"))
+					node.appendKod("\tPUSH R6\n");
 			} else {
-				node.appendKod("\tLOAD R0, (" + label + ")\n");
-				node.appendKod("\tPUSH R0\n");
+				if (node.isArray()) {
+					node.appendKod("\tMOVE " + label + ", R0\n");
+					node.appendKod("\tPUSH R0\n");		
+				} else {
+					node.appendKod("\tLOAD R0, (" + label + ")\n");
+					node.appendKod("\tPUSH R0\n");
+				}
 			}
-
 			node.setLabela(label);
 		}
 		if (init.getContent().startsWith("BROJ")) {
@@ -277,6 +284,10 @@ public class ActualAnalizator {
 				return;
 			node.setTypes(node.getChildAt(0).getTypes(scope));
 			node.addType(node.getChildAt(2).getType(scope));
+
+			node.appendKod(node.getChildAt(0).getKod());
+			node.appendKod(node.getChildAt(2).getKod());
+
 		}
 	}
 
@@ -864,13 +875,13 @@ public class ActualAnalizator {
 			scope.addChild(newNode);
 		}
 
-		int offset = 4;
+		int offset = 4 * (node.getNames().size());
 		for (String n : node.getNames()) {
 			node.appendKod("\tLOAD R0, (R7+" + offset + ")\n");
 			String labela = "L" + labelCounter++;
 			node.appendKod("\tSTORE R0, (" + labela + ")\n");
 			getDeclaredYet(n).setLabela(labela);
-			offset += 4;
+			offset -= 4;
 			LabelTableNode ltnode = new LabelTableNode(labela, null);
 			ltnode.setEmpty(true);
 			labelTable.add(ltnode);
@@ -1201,6 +1212,10 @@ public class ActualAnalizator {
 
 			node.appendKod(node.getChildAt(5).getKod());
 
+			if (node.getChildAt(0).getType(scope).equals("void")) {
+				node.appendKod("\tRET\n");
+			}
+			
 			LabelTableNode ltnode = new LabelTableNode(node.getLabela(), node);
 			ltnode.setFunction(true);
 			// dodaj labelu u globalnu tablicu
