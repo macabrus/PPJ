@@ -67,16 +67,14 @@ public class ActualAnalizator {
 
 			// staviti na stog iz adrese od [nadji identifikator u 
 			// scopeu]
-			
-			for (TreeNode n : scope.getDeclaredStuff()) {
-				System.out.println(n.getName() + " " + n.getLabela());
-			}
-			
+				
 			TreeNode idn = getDeclaredYet(init.getName());
 			String label = idn.getLabela();
 			
 			if (node.isFunction()) {
 				node.appendKod("\tCALL " + label + "\n");
+				if (node.getTypes(scope).size() == 1 && !node.getTypeAt(0).equals("void"))
+					node.appendKod("\tADD R7, " + node.getTypes(scope).size() * 4 + ", R7\n");
 				node.appendKod("\tPUSH R6\n");
 			} else {
 				node.appendKod("\tLOAD R0, (" + label + ")\n");
@@ -764,7 +762,6 @@ public class ActualAnalizator {
 
 		int offset = 4;
 		for (String n : node.getNames()){
-			System.out.println("Obradjujem: " + n);
 			node.appendKod("\tLOAD R0, (R7+" + offset + ")\n");
 			String labela = "L" + labelCounter++;
 			node.appendKod("\tSTORE R0, (" + labela + ")\n");
@@ -773,7 +770,6 @@ public class ActualAnalizator {
 			LabelTableNode ltnode = new LabelTableNode(labela, null);
 			ltnode.setEmpty(true);
 			labelTable.add(ltnode);
-			System.out.println(n);
 		}
 		
 		// gadna brija neka
@@ -793,6 +789,9 @@ public class ActualAnalizator {
 			listaNaredbi(node.getChildAt(2));
 			if (error)
 				return;
+			node.appendKod(node.getChildAt(1).getKod());
+			node.appendKod(node.getChildAt(2).getKod());
+
 		}
 		scope = scope.getParent();
 	}
@@ -1129,6 +1128,7 @@ public class ActualAnalizator {
 			if (node.isInLoop())
 				node.getChildAt(0).setLoop();
 			deklaracija(node.getChildAt(0));
+			node.appendKod(node.getChildAt(0).getKod());
 		} else {
 			if (node.isInLoop()) {
 				node.getChildAt(0).setLoop();
@@ -1136,6 +1136,8 @@ public class ActualAnalizator {
 			}
 			listaDeklaracija(node.getChildAt(0));
 			deklaracija(node.getChildAt(1));
+			node.appendKod(node.getChildAt(0).getKod());
+			node.appendKod(node.getChildAt(1).getKod());
 		}
 	}
 
@@ -1230,6 +1232,7 @@ public class ActualAnalizator {
 
 			node.appendKod("\tLOAD R0, (R7)\n");
 			node.appendKod("\tSTORE R0, (" + labela + ")\n");
+			node.appendKod("\tADD R7, 4, R7\n");
 			LabelTableNode ltNode = new LabelTableNode(labela, node);
 			ltNode.setEmpty(true);
 			labelTable.add(ltNode);
